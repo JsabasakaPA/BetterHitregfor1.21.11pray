@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "betterhitreg",
+  "version": "${version}",
+  "name": "BetterHitreg",
+  "description": "Clientside mod that registers hits before the server to make hitreg feel faster (use /hitreg to configure)",
+  "authors": ["Jass"],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/betterhitreg/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "you.jass.betterhitreg.BetterHitreg"
+    ]
+  },
+  "mixins": [
+    "betterhitreg.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

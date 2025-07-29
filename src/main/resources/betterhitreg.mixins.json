@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "you.jass.betterhitreg.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AttackMixin",
+    "PacketMixin",
+    "RenderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
