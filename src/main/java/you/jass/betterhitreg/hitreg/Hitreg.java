@@ -1,11 +1,16 @@
 package you.jass.betterhitreg.hitreg;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
+import you.jass.betterhitreg.util.Commands;
+import you.jass.betterhitreg.util.RegQueue;
 import you.jass.betterhitreg.util.Settings;
+
+import java.util.UUID;
 
 import static you.jass.betterhitreg.util.MultiVersion.message;
 import static you.jass.betterhitreg.util.MultiVersion.playParticles;
@@ -31,8 +36,10 @@ public class Hitreg {
     public static boolean wasSprinting;
     public static boolean sprintWasReset;
     public static boolean registered;
-    public static boolean wasGhosted;
+    public static boolean wasGhosted = true;
+    public static boolean newTarget;
     public static long lastProperAttack;
+    public static RegQueue last100Regs = new RegQueue(100);
     public static boolean tutorialAlreadySeen;
 
     public static void tick() {
@@ -40,7 +47,7 @@ public class Hitreg {
         if (client.player.isSprinting() && !wasSprinting) sprintWasReset = true;
         wasSprinting = client.player.isSprinting();
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
-        if (!registered && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
+        if (!wasGhosted && !newTarget && !registered && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
             if (Settings.isAlertGhosts()) message("hit §7was §cghosted", "/hitreg alertGhosts");
             registered = true;
             wasGhosted = true;
@@ -48,8 +55,8 @@ public class Hitreg {
 
         if (!tutorialAlreadySeen && Settings.isTutorial()) {
             message("Thanks for using BetterHitreg!", "/hitreg");
-            message("use /hitreg to configure", "/hitreg");
-            message("(or click on this message)", "/hitreg");
+            message("use /hitreg or press " + Commands.getUIKey() + " to configure", "/hitreg");
+            message("(you can click on these messages)", "/hitreg");
             tutorialAlreadySeen = true;
         }
     }
@@ -64,33 +71,51 @@ public class Hitreg {
 
         if (!Settings.isHideAnimations() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());
 
-        if (Settings.isLegacySounds() && !hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+        if (!Settings.isSilenceSelf()) {
+            if (Settings.isLegacySounds() && !hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
 
-        else if (hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
+            else if (hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
 
-        else if (sprinting && sprintWasReset) {
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-        }
+            else if (sprinting && sprintWasReset) {
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+            }
 
-        else if (falling) {
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1, 1);
-        }
+            else if (falling) {
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1, 1);
+            }
 
-        else if (holdingSword) {
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
-        }
+            else if (holdingSword) {
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
+            }
 
-        else {
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-            client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+            else {
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+            }
         }
 
         nextAttack = -1;
         sprintWasReset = false;
+    }
+
+    public static int getPing(UUID uuid) {
+        if (client.getNetworkHandler() == null) return -1;
+        PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(uuid);
+        return entry == null ? -1 : entry.getLatency();
+    }
+
+    public static int getPlayersPing() {
+        if (client.player == null) return -1;
+        return getPing(client.player.getUuid());
+    }
+
+    public static int getTargetsPing() {
+        if (targetEntity == null) return -1;
+        return getPing(targetEntity.getUuid());
     }
 
     public static boolean isToggled() {
@@ -98,8 +123,7 @@ public class Hitreg {
     }
 
     public static boolean withinFight() {
-        if (System.currentTimeMillis() - lastAttack > 500) return false;
-        if (targetEntity != null && client.player.squaredDistanceTo(targetEntity) > 25) return false;
+        if (targetEntity != null && client.player.squaredDistanceTo(targetEntity) > 30) return false;
         return true;
     }
 }

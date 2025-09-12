@@ -5,8 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AttackMixin",
+    "DamageMixin",
     "PacketMixin",
-    "RenderMixin"
+    "ParticleMixin",
+    "RenderMixin",
+    "SoundMixin"
   ],
   "injectors": {
     "defaultRequire": 1

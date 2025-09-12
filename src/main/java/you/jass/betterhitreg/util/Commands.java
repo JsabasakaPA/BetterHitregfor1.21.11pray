@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.text.*;
+import you.jass.betterhitreg.BetterHitreg;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
@@ -18,27 +19,41 @@ public class Commands {
                         .then(ClientCommandManager.literal("alertGhosts").executes(context -> toggle("alert ghosts")))
                         .then(ClientCommandManager.literal("legacySounds").executes(context -> toggle("1.8 sounds")))
                         .then(ClientCommandManager.literal("hideAnimations").executes(context -> toggle("hide animations")))
+                        .then(ClientCommandManager.literal("hideCritParticles").executes(context -> toggle("hide crit particles")))
+                        .then(ClientCommandManager.literal("hideEnchantParticles").executes(context -> toggle("hide enchant particles")))
                         .then(ClientCommandManager.literal("particlesEveryHit").executes(context -> toggle("particles on every hit")))
                         .then(ClientCommandManager.literal("silenceOtherFights").executes(context -> toggle("silence other fights")))
+                        .then(ClientCommandManager.literal("silenceSelf").executes(context -> toggle("silence self")))
+                        .then(ClientCommandManager.literal("silenceThem").executes(context -> toggle("silence them")))
                         .then(ClientCommandManager.literal("hideOtherFights").executes(context -> toggle("hide other fights")))
+                        .then(ClientCommandManager.literal("muffledHitsounds").executes(context -> toggle("muffled hitsounds")))
                         .then(ClientCommandManager.literal("safeRegsOnly").executes(context -> toggle("safe regs only")))
                         .then(ClientCommandManager.literal("set").then(argument("value", IntegerArgumentType.integer()).executes(context -> set(IntegerArgumentType.getInteger(context, "value")))).executes(context -> set(0)))
                         .executes(context -> guide())));
     }
 
     public static int guide() {
-        message("/hitreg <command> (you can click these messages)", "/hitreg toggle");
+        message("/hitreg <command> (press " + getUIKey() + " for UI)", "/hitreg toggle");
         message("custom hitreg: " + (Settings.isToggled() ? "§f" + Settings.getHitreg() + "§7ms" : "§coff"), "/hitreg set 0");
         message("alert delays: " + onOrOff(Settings.isAlertDelays()), "/hitreg alertDelays");
         message("alert ghosts: " + onOrOff(Settings.isAlertGhosts()), "/hitreg alertGhosts");
         message("1.8 sounds: " + onOrOff(Settings.isLegacySounds()), "/hitreg legacySounds");
         message("hide animations: " + onOrOff(Settings.isHideAnimations()), "/hitreg hideAnimations");
+        message("hide crit particles: " + onOrOff(Settings.isHideCritParticles()), "/hitreg hideEnchantParticles");
+        message("hide enchant particles: " + onOrOff(Settings.isHideEnchantParticles()), "/hitreg hideCritParticles");
         message("particles on every hit: " + onOrOff(Settings.isParticlesEveryHit()), "/hitreg particlesEveryHit");
         message("silence other fights: " + onOrOff(Settings.isSilenceOtherFights()), "/hitreg silenceOtherFights");
+        message("silence your hits: " + onOrOff(Settings.isSilenceSelf()), "/hitreg silenceSelf");
+        message("silence their hits: " + onOrOff(Settings.isSilenceThem()), "/hitreg silenceThem");
         message("hide other fights: " + onOrOff(Settings.isHideOtherFights()), "/hitreg hideOtherFights");
+        message("muffled hitsounds: " + onOrOff(Settings.isMuffledHitsounds()), "/hitreg muffledHitsounds");
         message("safe regs only: " + onOrOff(Settings.isSafeRegsOnly()) + " §7(first hits " + (Settings.isSafeRegsOnly() ? "will not" : "will") + " use custom hitreg)", "/hitreg safeRegsOnly");
         if (Settings.isTutorial()) Settings.set("tutorial", "false");
         return 1;
+    }
+
+    public static String getUIKey() {
+        return BetterHitreg.UIKey.getBoundKeyTranslationKey().replace("key.keyboard.", "").replace("key.mouse.", "").replace(".", " ").toUpperCase();
     }
 
     public static int toggle(String setting) {
@@ -48,9 +63,14 @@ public class Commands {
             case "alert ghosts" -> "alertGhosts";
             case "1.8 sounds" -> "legacySounds";
             case "hide animations" -> "hideAnimations";
+            case "hide crit particles" -> "hideCritParticles";
+            case "hide enchant particles" -> "hideEnchantParticles";
             case "particles on every hit" -> "particlesEveryHit";
             case "silence other fights" -> "silenceOtherFights";
+            case "silence self" -> "silenceSelf";
+            case "silence them" -> "silenceThem";
             case "hide other fights" -> "hideOtherFights";
+            case "muffled hitsounds" -> "muffledHitsounds";
             case "safe regs only" -> "safeRegsOnly";
             default -> "";
         };

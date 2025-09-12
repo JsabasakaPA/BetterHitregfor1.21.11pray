@@ -14,13 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import you.jass.betterhitreg.util.Settings;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.*;
+import static you.jass.betterhitreg.util.MultiVersion.message;
 
 @Mixin(PlayerInteractEntityC2SPacket.class)
 public abstract class AttackMixin {
     @Inject(method = "attack", at = @At("HEAD"))
     private static void attack(Entity entity, boolean playerSneaking, CallbackInfoReturnable<PlayerInteractEntityC2SPacket> cir) {
         if (client.player == null || !entity.isAlive()) return;
-        if (lastEntity != entity.getId()) wasGhosted = true;
+        newTarget = lastEntity != entity.getId();
         hitEarly = System.currentTimeMillis() - lastProperAttack < 500;
         sprinting = client.player.isSprinting();
         falling = client.player.getVelocity().getY() < -0.08;

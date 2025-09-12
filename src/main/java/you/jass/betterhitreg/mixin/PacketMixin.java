@@ -6,8 +6,6 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,18 +28,18 @@ public abstract class PacketMixin {
             if (Settings.isHideAnimations()) ci.cancel();
 
             if (lastEntity == damagePacket.entityId()) {
-                if (Settings.isAlertDelays() && !alreadyAnimated) message("animation §7was §f" + (System.currentTimeMillis() - lastAttack) + "§7ms", "/hitreg alertDelays");
+                long delay = System.currentTimeMillis() - lastProperAttack;
+                if (Settings.isAlertDelays() && !alreadyAnimated && delay <= 500) message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays");
+                if (wasGhosted || delay <= 500) last100Regs.add(!wasGhosted ? (int) delay : -1);
                 lastAnimation = System.currentTimeMillis();
                 alreadyAnimated = true;
                 registered = true;
                 wasGhosted = false;
                 if (isToggled && withinFight) ci.cancel();
-                if (!isToggled() && withinFight() && Settings.isParticlesEveryHit()) playParticles("ENCHANTED_HIT", targetEntity);
+                if (!isToggled && withinFight && Settings.isParticlesEveryHit()) playParticles("ENCHANTED_HIT", targetEntity);
             }
 
-            else if (client.player != null && client.player.getId() == damagePacket.entityId()) {
-                lastAttacked = System.currentTimeMillis();
-            }
+            else if (client.player != null && client.player.getId() == damagePacket.entityId()) lastAttacked = System.currentTimeMillis();
         }
 
         else if (packet instanceof EntityAnimationS2CPacket animationPacket) {
@@ -58,60 +56,26 @@ public abstract class PacketMixin {
             }
         }
 
-        else if (packet instanceof PlaySoundS2CPacket soundPacket && soundPacket.getCategory() == SoundCategory.PLAYERS && soundPacket.getSound().getType() == RegistryEntry.Type.REFERENCE) {
-            if (soundPacket.getSound().getKey().isPresent() && (soundPacket.getSound().getKey().get().toString().contains("entity.player.hurt") || soundPacket.getSound().getKey().get().toString().contains("entity.player.attack"))) {
+        else if (packet instanceof PlaySoundS2CPacket soundPacket && soundPacket.getCategory() == SoundCategory.PLAYERS) {
+            boolean isLegacy = soundPacket.getSound().getType() == RegistryEntry.Type.DIRECT;
+            boolean isModern = soundPacket.getSound().getKey().isPresent() && (soundPacket.getSound().getKey().get().toString().contains("entity.player.hurt") || soundPacket.getSound().getKey().get().toString().contains("entity.player.attack"));
+            if (isModern || isLegacy) {
                 Vec3d location = new Vec3d(soundPacket.getX(), soundPacket.getY(), soundPacket.getZ());
                 double distance = client.player != null ? client.player.squaredDistanceTo(location.x, location.y, location.z) : 0;
 
-                if (soundPacket.getSound().getKey().get().toString().contains("player.attack.knockback")) {
-                    playKB = location;
-                    lastKnockback = System.currentTimeMillis();
-                }
+                long timeSinceAttack = System.currentTimeMillis() - lastAnimation;
+                long timeSinceAttacked = System.currentTimeMillis() - lastAttacked;
+                boolean outsideFight = distance > 30 || (timeSinceAttack > 5 && timeSinceAttacked > 5);
+                boolean theyHit = timeSinceAttacked <= timeSinceAttack;
+                boolean youHit = timeSinceAttack <= timeSinceAttacked;
 
-                if (Settings.isSilenceOtherFights() && (!withinFight || distance > 25)) ci.cancel();
-
-                else if (isToggled && withinFight && distance <= 25) {
-                    if (System.currentTimeMillis() - lastAttacked > 10) ci.cancel();
-                    else if (System.currentTimeMillis() - lastKnockback <= 10 && soundPacket.getSound().getKey().get().toString().contains("player.attack.strong")) ci.cancel();
-                }
-
-                if (!ci.isCancelled() && Settings.isLegacySounds() && !soundPacket.getSound().getKey().get().toString().contains("entity.player.hurt")) {
-                    ci.cancel();
+                if (isModern && Settings.isLegacySounds() && !soundPacket.getSound().getKey().get().toString().contains("entity.player.hurt")) ci.cancel();
+                if (Settings.isSilenceOtherFights() && (!withinFight || outsideFight)) ci.cancel();
+                if (withinFight && !outsideFight) {
+                    if (youHit && (isToggled || Settings.isSilenceSelf())) ci.cancel();
+                    if (theyHit && Settings.isSilenceThem()) ci.cancel();
                 }
             }
-        }
-
-        //legacy server support
-        else if (packet instanceof PlaySoundS2CPacket soundPacket && soundPacket.getCategory() == SoundCategory.PLAYERS && soundPacket.getSound().getType() == RegistryEntry.Type.DIRECT) {
-            Vec3d location = new Vec3d(soundPacket.getX(), soundPacket.getY(), soundPacket.getZ());
-            double distance = client.player != null ? client.player.squaredDistanceTo(location.x, location.y, location.z) : 0;
-
-            if (Settings.isSilenceOtherFights() && (!withinFight || distance > 25)) ci.cancel();
-            else if (isToggled && withinFight && distance <= 25 && System.currentTimeMillis() - lastAttacked > 10) ci.cancel();
-        }
-
-        //won't work on some servers as they don't send velocity update packets
-        else if (packet instanceof EntityVelocityUpdateS2CPacket velocityPacket) {
-            if (lastEntity != getVelocityId(velocityPacket)) return;
-            if (Settings.isAlertDelays() && !alreadyKnockbacked) message("knockback §7was §f" + (System.currentTimeMillis() - lastAttack) + "§7ms", "/hitreg alertDelays");
-            alreadyKnockbacked = true;
-        }
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void tick(final CallbackInfo ci) {
-        if (client.world == null) return;
-        if (Settings.isToggled() && !(Settings.isSafeRegsOnly() && wasGhosted) && playKB != null) {
-            if (System.currentTimeMillis() - lastAttacked <= 50) {
-                client.world.playSound(client.player, playKB.getX(), playKB.getY(), playKB.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, playKB.getX(), playKB.getY(), playKB.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
-            }
-            playKB = null;
-        }
-
-        if (playLegacy != null) {
-            client.world.playSound(client.player, BlockPos.ofFloored(playLegacy), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-            playLegacy = null;
         }
     }
 }
