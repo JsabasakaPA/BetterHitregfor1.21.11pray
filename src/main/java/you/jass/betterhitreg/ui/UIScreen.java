@@ -34,6 +34,7 @@ public class UIScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        if (Settings.isTutorial()) Settings.set("tutorial", "false");
 
         widgets.clear();
 
