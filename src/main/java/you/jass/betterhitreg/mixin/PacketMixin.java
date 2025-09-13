@@ -86,7 +86,7 @@ public abstract class PacketMixin {
                     knockbacks.add(new Knockback(soundPacket));
                     ci.cancel();
                 } else {
-                    if (!processSound(sound, location ,isModern)) ci.cancel();
+                    if (!processSound(sound, location, isModern)) ci.cancel();
                 }
             }
         }
