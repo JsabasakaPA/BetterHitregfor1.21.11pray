@@ -102,9 +102,7 @@ public abstract class PacketMixin {
             Knockback knockback = knockbacks.poll();
             if (System.currentTimeMillis() - knockback.timestamp <= 5) {
                 if (processSound("entity.player.attack.knockback", knockback.location, true)) {
-                    client.execute(() -> {
-                        client.world.playSound(client.player, knockback.packet.getX(), knockback.packet.getY(), knockback.packet.getZ(), knockback.packet.getSound(), knockback.packet.getCategory(), knockback.packet.getVolume(), knockback.packet.getPitch(), knockback.packet.getSeed());
-                    });
+                    client.execute(() -> client.world.playSound(client.player, knockback.packet.getX(), knockback.packet.getY(), knockback.packet.getZ(), knockback.packet.getSound(), knockback.packet.getCategory(), knockback.packet.getVolume(), knockback.packet.getPitch(), knockback.packet.getSeed()));
                 }
             }
         }
