@@ -7,9 +7,12 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import you.jass.betterhitreg.util.Commands;
+import you.jass.betterhitreg.util.MultiVersion;
 import you.jass.betterhitreg.util.RegQueue;
 import you.jass.betterhitreg.util.Settings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static you.jass.betterhitreg.util.MultiVersion.message;
@@ -17,13 +20,10 @@ import static you.jass.betterhitreg.util.MultiVersion.playParticles;
 
 public class Hitreg {
     public static MinecraftClient client;
-    public static Vec3d playKB;
-    public static Vec3d playLegacy;
     public static int lastEntity;
     public static Entity targetEntity;
     public static long lastAttack;
     public static long lastAttacked;
-    public static long lastKnockback;
     public static long lastAnimation;
     public static long nextAttack = -1;
     public static boolean hitEarly;
@@ -47,6 +47,13 @@ public class Hitreg {
         if (client.player.isSprinting() && !wasSprinting) sprintWasReset = true;
         wasSprinting = client.player.isSprinting();
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
+
+//        if (!knockbackSounds.isEmpty()) {
+//            message("processing kb " + (System.currentTimeMillis() - lastAnimation) + " " + (System.currentTimeMillis() - lastAttacked), "");
+//            for (Vec3d knockbackSound : knockbackSounds) client.world.playSound(client.player, knockbackSound.x, knockbackSound.y, knockbackSound.z, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
+//            knockbackSounds.clear();
+//        }
+
         if (!wasGhosted && !newTarget && !registered && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
             if (Settings.isAlertGhosts()) message("hit §7was §cghosted", "/hitreg alertGhosts");
             registered = true;
@@ -72,29 +79,31 @@ public class Hitreg {
         if (!Settings.isHideAnimations() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());
 
         if (!Settings.isSilenceSelf()) {
-            if (Settings.isLegacySounds() && !hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+            Vec3d location = MultiVersion.getPosition(entity);
 
-            else if (hitEarly) client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
+            if (Settings.isLegacySounds() && !hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+
+            else if (hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
 
             else if (sprinting && sprintWasReset) {
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
             }
 
             else if (falling) {
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1, 1);
             }
 
             else if (holdingSword) {
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
             }
 
             else {
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
             }
         }
 
