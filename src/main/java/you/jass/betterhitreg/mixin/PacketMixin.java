@@ -1,25 +1,17 @@
 package you.jass.betterhitreg.mixin;
 
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import you.jass.betterhitreg.util.Knockback;
 import you.jass.betterhitreg.util.Settings;
+import you.jass.betterhitreg.util.Sound;
 
 import java.util.*;
 
@@ -47,12 +39,12 @@ public abstract class PacketMixin {
                 wasGhosted = false;
                 if (isToggled && withinFight) ci.cancel();
                 if (!isToggled && withinFight && Settings.isParticlesEveryHit()) playParticles("ENCHANTED_HIT", targetEntity);
-                processKnockbacks();
+                processDelayedSounds();
             }
 
             else if (client.player != null && client.player.getId() == damagePacket.entityId()) {
                 lastAttacked = System.currentTimeMillis();
-                processKnockbacks();
+                processDelayedSounds();
             }
         }
 
@@ -71,61 +63,59 @@ public abstract class PacketMixin {
         }
 
         else if (packet instanceof PlaySoundS2CPacket soundPacket && soundPacket.getCategory() == SoundCategory.PLAYERS) {
-            boolean isLegacy = soundPacket.getSound().getType() == RegistryEntry.Type.DIRECT;
-            boolean isModern = soundPacket.getSound().getKey().isPresent() && (soundPacket.getSound().getKey().get().toString().contains("entity.player.hurt") || soundPacket.getSound().getKey().get().toString().contains("entity.player.attack"));
-            if (isModern || isLegacy) {
-                boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceSelf() || Settings.isSilenceThem());
-                if (vanilla) return;
-
-                String sound = soundPacket.getSound().getKey().get().toString();
-                Vec3d location = new Vec3d(soundPacket.getX(), soundPacket.getY(), soundPacket.getZ());
-                double distance = client.player != null ? client.player.squaredDistanceTo(location.x, location.y, location.z) : 0;
-
-                if (Settings.isSilenceOtherFights() && distance > 30) ci.cancel();
-                else if (sound.contains("knockback")) {
-                    knockbacks.add(new Knockback(soundPacket));
-                    ci.cancel();
-                } else {
-                    if (!processSound(sound, location, isModern)) ci.cancel();
-                }
+            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceSelf() || Settings.isSilenceThem());
+            if (vanilla) return;
+            Sound sound = new Sound(soundPacket);
+            if (sound.modern || sound.legacy) {
+                if (!processSound(sound)) ci.cancel();
             }
         }
     }
 
     @Unique
-    private static Queue<Knockback> knockbacks = new LinkedList<>();
+    private static Queue<Sound> delayedSounds = new LinkedList<>();
 
     @Unique
-    private static void processKnockbacks() {
+    private static void processDelayedSounds() {
         if (client.world == null || client.player == null) return;
-        while (!knockbacks.isEmpty()) {
-            Knockback knockback = knockbacks.poll();
-            if (System.currentTimeMillis() - knockback.timestamp <= 5) {
-                if (processSound("entity.player.attack.knockback", knockback.location, true)) {
-                    client.execute(() -> client.world.playSound(client.player, knockback.packet.getX(), knockback.packet.getY(), knockback.packet.getZ(), knockback.packet.getSound(), knockback.packet.getCategory(), knockback.packet.getVolume(), knockback.packet.getPitch(), knockback.packet.getSeed()));
+        while (!delayedSounds.isEmpty()) {
+            Sound sound = delayedSounds.poll();
+            if (sound.wasRecent()) {
+                if (processSound(sound)) {
+                    client.execute(() -> client.world.playSound(client.player, sound.packet.getX(), sound.packet.getY(), sound.packet.getZ(), sound.packet.getSound(), sound.packet.getCategory(), sound.packet.getVolume(), sound.packet.getPitch(), sound.packet.getSeed()));
                 }
             }
         }
     }
 
     @Unique
-    private static boolean processSound(String sound, Vec3d location, boolean modern) {
+    private static boolean processSound(Sound sound) {
         boolean isToggled = isToggled();
-        boolean withinFight = withinFight();
-        double distance = client.player != null ? client.player.squaredDistanceTo(location.x, location.y, location.z) : 0;
-        long timeSinceAttack = System.currentTimeMillis() - lastAnimation;
-        long timeSinceAttacked = System.currentTimeMillis() - lastAttacked;
-        boolean outsideFight = distance > 30 || (timeSinceAttack > 5 && timeSinceAttacked > 5);
-        boolean theyHit = timeSinceAttacked <= timeSinceAttack;
-        boolean youHit = timeSinceAttack <= timeSinceAttacked;
+        boolean playerWithinFight = withinFight();
+        boolean soundWithinFight = sound.withinFight();
 
-        if (sound.contains("nodamage")) return false;
-        if (modern && Settings.isLegacySounds() && !sound.contains("entity.player.hurt")) return false;
-        if (Settings.isSilenceOtherFights() && (!withinFight || outsideFight)) return false;
+        //if the sound happened far away, then block it if were silencing other fights and skip it if were not
+        if (!playerWithinFight && !soundWithinFight) {
+            return !Settings.isSilenceOtherFights();
+        }
 
-        if (withinFight && !outsideFight) {
-            if (youHit && (isToggled || Settings.isSilenceSelf())) return false;
-            if (theyHit && Settings.isSilenceThem()) return false;
+        //block nodamage sounds because they don't actually register hits so we don't know who they're from
+        if (sound.sound.contains("nodamage")) return false;
+
+        //block all modern attack sounds if legacy sounds are enabled
+        if (sound.modern && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
+
+        //block the sound based on whether you hit them or they hit you
+        if (sound.wasFromYou() && (isToggled || Settings.isSilenceSelf())) return false;
+        if (sound.wasFromThem() && Settings.isSilenceThem()) return false;
+
+        //delay knockback sounds because for some reason knockback sounds come before hit registration on most servers
+        //don't delay it if its already been processed though, or it would just keep delaying indefinitely
+        //if it was from either of you, no need to delay it as it came after hit registration, minemenclub sends it after
+        if (!sound.processed && sound.sound.contains("knockback") && !sound.wasFromYou() && !sound.wasFromThem()) {
+            sound.processed = true;
+            delayedSounds.add(sound);
+            return false;
         }
 
         return true;

@@ -48,13 +48,7 @@ public class Hitreg {
         wasSprinting = client.player.isSprinting();
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
 
-//        if (!knockbackSounds.isEmpty()) {
-//            message("processing kb " + (System.currentTimeMillis() - lastAnimation) + " " + (System.currentTimeMillis() - lastAttacked), "");
-//            for (Vec3d knockbackSound : knockbackSounds) client.world.playSound(client.player, knockbackSound.x, knockbackSound.y, knockbackSound.z, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
-//            knockbackSounds.clear();
-//        }
-
-        if (!wasGhosted && !newTarget && !registered && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
+        if (!wasGhosted && !newTarget && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
             if (Settings.isAlertGhosts()) message("hit §7was §cghosted", "/hitreg alertGhosts");
             registered = true;
             wasGhosted = true;
@@ -132,7 +126,10 @@ public class Hitreg {
     }
 
     public static boolean withinFight() {
-        if (targetEntity != null && client.player.squaredDistanceTo(targetEntity) > 30) return false;
-        return true;
+        return targetEntity == null || client.player == null || !(client.player.squaredDistanceTo(targetEntity) > 30);
+    }
+
+    public static boolean bothAlive() {
+        return targetEntity != null && client.player != null && client.player.isAlive() && targetEntity.isAlive();
     }
 }
