@@ -233,9 +233,6 @@ public class UIScreen extends Screen {
     //TODO 1.19.4
 //    @Override
 //    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-//        //UIUtils.drawRectangle(matrixStack, 0, 0, width, height, background);
-//
-//        // render all widgets
 //        for (UIElement w : widgets) {
 //            w.render(matrixStack, mouseX, mouseY);
 //        }
@@ -249,9 +246,6 @@ public class UIScreen extends Screen {
     //TODO 1.20 - 1.21.8
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        UIUtils.drawRectangle(ctx, 0, 0, width, height, background);
-
-        // render all widgets
         for (UIElement w : widgets) {
             w.render(ctx, mouseX, mouseY);
         }

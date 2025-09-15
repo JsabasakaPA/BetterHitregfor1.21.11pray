@@ -33,7 +33,7 @@ public class MultiVersion {
         //TODO 1.20.6
         //return 20.6;
         //TODO 1.21
-        return 21;
+        //return 21;
         //TODO 1.21.1
         //return 21.1;
         //TODO 1.21.2
@@ -49,7 +49,7 @@ public class MultiVersion {
         //TODO 1.21.7
         //return 21.7;
         //TODO 1.21.8
-        //return 21.8;
+        return 21.8;
     }
 
     public static Vec3d getPosition(Entity entity) {
@@ -59,10 +59,10 @@ public class MultiVersion {
         //return entity.getLerpedPos(client.getTickDelta());
 
         //TODO 1.21 - 1.21.4
-        return entity.getLerpedPos(client.getRenderTickCounter().getTickDelta(true));
+        //return entity.getLerpedPos(client.getRenderTickCounter().getTickDelta(true));
 
         //TODO 1.21.5 - 1.21.8
-        //return entity.getLerpedPos(client.getRenderTickCounter().getTickProgress(true));
+        return entity.getLerpedPos(client.getRenderTickCounter().getTickProgress(true));
     }
 
     public static void playParticles(String type, Entity entity) {
@@ -84,17 +84,7 @@ public class MultiVersion {
             else if (type.equals("ENCHANTED_HIT")) particle = ParticleTypes.ENCHANTED_HIT;
 
             //TODO 1.19.4 - 1.21.4
-            client.world.addParticle(
-                    particle,
-                    position.x + x,
-                    position.y + (entity.getHeight() / 2) + y,
-                    position.z + z,
-                    direction.x * 0.5,
-                    direction.y * 0.5,
-                    direction.z * 0.5);
-
-            //TODO 1.21.5 - 1.21.8
-            //client.world.addParticleClient(
+            //client.world.addParticle(
             //particle,
             //position.x + x,
             //position.y + (entity.getHeight() / 2) + y,
@@ -102,6 +92,16 @@ public class MultiVersion {
             //direction.x * 0.5,
             //direction.y * 0.5,
             //direction.z * 0.5);
+
+            //TODO 1.21.5 - 1.21.8
+            client.world.addParticleClient(
+                    particle,
+                    position.x + x,
+                    position.y + (entity.getHeight() / 2) + y,
+                    position.z + z,
+                    direction.x * 0.5,
+                    direction.y * 0.5,
+                    direction.z * 0.5);
         }
     }
 
@@ -111,12 +111,12 @@ public class MultiVersion {
         if (command.equals("/hitreg")) hoverText = Text.literal("§7Click to configure");
 
         //TODO 1.19.4 - 1.21.4
-        ClickEvent clickEvent = new ClickEvent(!settingHitreg ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND, command);
-        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+        //ClickEvent clickEvent = new ClickEvent(!settingHitreg ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND, command);
+        //HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
 
         //TODO 1.21.5 - 1.21.8
-        //ClickEvent clickEvent = !settingHitreg ? new ClickEvent.RunCommand(command) : new ClickEvent.SuggestCommand(command);
-        //HoverEvent hoverEvent = new HoverEvent.ShowText(hoverText);
+        ClickEvent clickEvent = !settingHitreg ? new ClickEvent.RunCommand(command) : new ClickEvent.SuggestCommand(command);
+        HoverEvent hoverEvent = new HoverEvent.ShowText(hoverText);
 
         Text text = Text.literal("Hitreg §8|§r " + message).setStyle(Style.EMPTY
                 .withColor(TextColor.fromRgb(0xFFD700))

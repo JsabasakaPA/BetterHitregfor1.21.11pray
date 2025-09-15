@@ -94,28 +94,32 @@ public abstract class PacketMixin {
         boolean playerWithinFight = withinFight();
         boolean soundWithinFight = sound.withinFight();
 
+        //block all modern attack sounds if legacy sounds are enabled
+        if (sound.modern && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
+
         //if the sound happened far away, then block it if were silencing other fights and skip it if were not
-        if (!playerWithinFight && !soundWithinFight) {
-            return !Settings.isSilenceOtherFights();
-        }
+        if (!playerWithinFight && !soundWithinFight) return !Settings.isSilenceOtherFights();
 
         //block nodamage sounds because they don't actually register hits so we don't know who they're from
         if (sound.sound.contains("nodamage")) return false;
-
-        //block all modern attack sounds if legacy sounds are enabled
-        if (sound.modern && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
 
         //block the sound based on whether you hit them or they hit you
         if (sound.wasFromYou() && (isToggled || Settings.isSilenceSelf())) return false;
         if (sound.wasFromThem() && Settings.isSilenceThem()) return false;
 
-        //delay knockback sounds because for some reason knockback sounds come before hit registration on most servers
-        //don't delay it if its already been processed though, or it would just keep delaying indefinitely
-        //if it was from either of you, no need to delay it as it came after hit registration, minemenclub sends it after
-        if (!sound.processed && sound.sound.contains("knockback") && !sound.wasFromYou() && !sound.wasFromThem()) {
-            sound.processed = true;
-            delayedSounds.add(sound);
-            return false;
+        //if the sound wasn't from either of you
+        if (!sound.wasFromYou() && !sound.wasFromThem()) {
+            //delay knockback sounds because for some reason knockback sounds come before hit registration on most servers
+            //don't delay it if its already been processed though, or it would just keep delaying indefinitely
+            //if it was from either of you, no need to delay it as it came after hit registration, minemenclub sends it after
+            if (!sound.processed && sound.sound.contains("knockback")) {
+                sound.processed = true;
+                delayedSounds.add(sound);
+                return false;
+            }
+
+            //if it wasn't from either of you and were silencing other fights, silence it
+            if (Settings.isSilenceOtherFights()) return false;
         }
 
         return true;

@@ -17,7 +17,7 @@ public class Settings {
         defaults.setProperty("toggled", "true");
         defaults.setProperty("hitreg", "0");
         defaults.setProperty("alertDelays", "false");
-        defaults.setProperty("alertGhosts", "false");
+        defaults.setProperty("alertGhosts", "true");
         defaults.setProperty("legacySounds", "false");
         defaults.setProperty("hideCritParticles", "false");
         defaults.setProperty("hideEnchantParticles", "false");
@@ -27,7 +27,7 @@ public class Settings {
         defaults.setProperty("silenceSelf", "false");
         defaults.setProperty("silenceThem", "false");
         defaults.setProperty("hideOtherFights", "false");
-        defaults.setProperty("muffledHitsounds", "true");
+        defaults.setProperty("muffledHitsounds", "false");
         defaults.setProperty("safeRegsOnly", "true");
         defaults.setProperty("tutorial", "true");
         properties.putAll(defaults);
