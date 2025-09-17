@@ -8,7 +8,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import you.jass.betterhitreg.util.Settings;
 
 import java.util.Objects;
@@ -16,7 +19,7 @@ import java.util.Objects;
 @Mixin(SoundSystem.class)
 public class SoundMixin {
     @ModifyVariable(method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At("HEAD"), argsOnly = true)
-    private SoundInstance onPlay(SoundInstance sound) {
+    private SoundInstance play(SoundInstance sound) {
         if (!Settings.isMuffledHitsounds() || sound == null || sound.getId() == null) return sound;
         if (!sound.getId().getPath().startsWith("entity.player") || Objects.equals(sound.getId().getNamespace(), "betterhitreg")) return sound;
         return new PositionedSoundInstance(
@@ -33,5 +36,12 @@ public class SoundMixin {
                 sound.getZ(),
                 sound.isRelative()
         );
+    }
+
+    @Inject (method = "play(Lnet/minecraft/client/sound/SoundInstance;)Lnet/minecraft/client/sound/SoundSystem$PlayResult;", at = @At("HEAD"), cancellable = true)
+    private void play(SoundInstance sound, CallbackInfoReturnable<SoundSystem.PlayResult> cir) {
+        if (sound == null || sound.getId() == null) return;
+        if (sound.getCategory() != SoundCategory.PLAYERS || sound.getId().getPath().startsWith("entity.player.attack") || sound.getId().getPath().startsWith("entity.player.hurt")) return;
+        if (Settings.isSilenceNonHits()) cir.cancel();
     }
 }

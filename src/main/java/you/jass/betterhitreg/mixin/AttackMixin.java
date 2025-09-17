@@ -15,7 +15,6 @@ public abstract class AttackMixin {
     @Inject(method = "attack", at = @At("HEAD"))
     private static void attack(Entity entity, boolean playerSneaking, CallbackInfoReturnable<PlayerInteractEntityC2SPacket> cir) {
         if (client.player == null || !entity.isAlive()) return;
-        newTarget = lastEntity != entity.getId();
         hitEarly = System.currentTimeMillis() - lastProperAttack < 500;
         sprinting = client.player.isSprinting();
         falling = client.player.getVelocity().getY() < -0.08;
@@ -26,6 +25,7 @@ public abstract class AttackMixin {
         lastAttack = System.currentTimeMillis();
         nextAttack = lastAttack + Settings.getHitreg();
         if (!hitEarly) {
+            newTarget = lastEntity != entity.getId();
             lastProperAttack = System.currentTimeMillis();
             alreadyAnimated = false;
             alreadyKnockbacked = false;

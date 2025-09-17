@@ -13,7 +13,7 @@ import you.jass.betterhitreg.util.Settings;
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
 
 @Mixin(WorldRenderer.class)
-public class ParticleMixin {
+public class WorldMixin {
     @Inject(method = "spawnParticle(Lnet/minecraft/particle/ParticleEffect;ZZDDDDDD)Lnet/minecraft/client/particle/Particle;", at = @At("HEAD"), cancellable = true)
     private void spawnParticle(ParticleEffect parameters, boolean alwaysSpawn, boolean canSpawnOnMinimal, double x, double y, double z, double velocityX, double velocityY, double velocityZ, CallbackInfoReturnable<Particle> cir) {
         if (Settings.isHideCritParticles() && parameters.getType() == ParticleTypes.CRIT) cir.cancel();

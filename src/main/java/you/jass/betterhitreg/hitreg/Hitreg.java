@@ -48,7 +48,7 @@ public class Hitreg {
         wasSprinting = client.player.isSprinting();
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
 
-        if (!wasGhosted && !newTarget && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 500) {
+        if (!wasGhosted && !newTarget && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 450) {
             if (Settings.isAlertGhosts()) message("hit §7was §cghosted", "/hitreg alertGhosts");
             registered = true;
             wasGhosted = true;
@@ -122,7 +122,9 @@ public class Hitreg {
     }
 
     public static boolean isToggled() {
-        return Settings.isToggled() && !(Settings.isSafeRegsOnly() && wasGhosted);
+        if (!Settings.isToggled()) return false;
+        if (Settings.isSafeRegsOnly() && (newTarget || wasGhosted)) return false;
+        return true;
     }
 
     public static boolean withinFight() {

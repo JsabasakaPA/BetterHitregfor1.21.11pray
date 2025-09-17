@@ -21,7 +21,7 @@ import static you.jass.betterhitreg.util.MultiVersion.*;
 @Mixin(ClientConnection.class)
 public abstract class PacketMixin {
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true, require = 1)
-    private static void readPacket(Packet packet, PacketListener listener, CallbackInfo ci) {
+    private static void handlePacket(Packet packet, PacketListener listener, CallbackInfo ci) {
         if (client.world == null || client.player == null) return;
         boolean isToggled = isToggled();
         boolean withinFight = withinFight();
@@ -62,9 +62,10 @@ public abstract class PacketMixin {
             }
         }
 
-        else if (packet instanceof PlaySoundS2CPacket soundPacket && soundPacket.getCategory() == SoundCategory.PLAYERS) {
-            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceSelf() || Settings.isSilenceThem());
+        else if (packet instanceof PlaySoundS2CPacket soundPacket) {
+            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceNonHits() || Settings.isSilenceSelf() || Settings.isSilenceThem());
             if (vanilla) return;
+
             Sound sound = new Sound(soundPacket);
             if (sound.modern || sound.legacy) {
                 if (!processSound(sound)) ci.cancel();
@@ -94,8 +95,11 @@ public abstract class PacketMixin {
         boolean playerWithinFight = withinFight();
         boolean soundWithinFight = sound.withinFight();
 
+        //block all non hit sounds in the player category if were muting them
+        if (sound.packet.getCategory() == SoundCategory.PLAYERS && (!sound.sound.contains("entity.player.attack") && !sound.sound.contains("entity.player.hurt"))) return !Settings.isSilenceNonHits();
+
         //block all modern attack sounds if legacy sounds are enabled
-        if (sound.modern && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
+        if (!sound.legacy && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
 
         //if the sound happened far away, then block it if were silencing other fights and skip it if were not
         if (!playerWithinFight && !soundWithinFight) return !Settings.isSilenceOtherFights();

@@ -15,7 +15,7 @@ public abstract class DamageMixin {
         at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/entity/LivingEntity;getHurtSound(Lnet/minecraft/entity/damage/DamageSource;)Lnet/minecraft/sound/SoundEvent;"),
         ordinal = 0
     )
-    private SoundEvent shouldPlaySound(SoundEvent original, DamageSource damageSource) {
+    private SoundEvent onDamaged(SoundEvent original, DamageSource damageSource) {
         return Settings.isSilenceThem() ? null : original;
     }
 }

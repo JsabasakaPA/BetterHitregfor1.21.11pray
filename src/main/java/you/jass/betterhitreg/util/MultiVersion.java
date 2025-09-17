@@ -1,13 +1,17 @@
 package you.jass.betterhitreg.util;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 import you.jass.betterhitreg.ui.UIUtils;
 
 import java.awt.*;
@@ -15,43 +19,6 @@ import java.awt.*;
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
 
 public class MultiVersion {
-    public static double getVersion() {
-        //TODO 1.19.4
-        //return 19.4;
-        //TODO 1.20
-        //return 20;
-        //TODO 1.20.1
-        //return 20.1;
-        //TODO 1.20.2
-        //return 20.2;
-        //TODO 1.20.3
-        //return 20.3;
-        //TODO 1.20.4
-        //return 20.4;
-        //TODO 1.20.5
-        //return 20.5;
-        //TODO 1.20.6
-        //return 20.6;
-        //TODO 1.21
-        //return 21;
-        //TODO 1.21.1
-        //return 21.1;
-        //TODO 1.21.2
-        //return 21.2;
-        //TODO 1.21.3
-        //return 21.3;
-        //TODO 1.21.4
-        //return 21.4;
-        //TODO 1.21.5
-        //return 21.5;
-        //TODO 1.21.6
-        //return 21.6;
-        //TODO 1.21.7
-        //return 21.7;
-        //TODO 1.21.8
-        return 21.8;
-    }
-
     public static Vec3d getPosition(Entity entity) {
         if (client.world == null || entity == null) return Vec3d.ZERO;
 
@@ -74,10 +41,10 @@ public class MultiVersion {
             double z = Math.random() - 0.5;
             Vec3d direction = new Vec3d(x, y, z).normalize();
 
-            //TODO 1.19.4
+            //TODO 1.19.4 - 1.20.4
             //DefaultParticleType particle = ParticleTypes.ASH;
 
-            //TODO 1.20.1 - 1.21.8
+            //TODO 1.20.5 - 1.21.8
             SimpleParticleType particle = ParticleTypes.ASH;
 
             if (type.equals("CRIT")) particle = ParticleTypes.CRIT;
@@ -266,5 +233,29 @@ public class MultiVersion {
             ctx.drawTextWithShadow(tr, ch, cx, y, col.getRGB());
             cx += tr.getWidth(ch);
         }
+    }
+
+    public static void renderLine(Matrix4f matrix, Vec3d vertex0, Vec3d vertex1, Vec3d vertex2, Vec3d vertex3, int color) {
+        //TODO 1.19.4 - 1.20.6
+        //Tessellator tess = Tessellator.getInstance();
+        //BufferBuilder buf = tess.getBuffer();
+        //buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        //buf.vertex(matrix, (float) vertex0.x, (float) vertex0.y, (float) vertex0.z).color(color).next();
+        //buf.vertex(matrix, (float) vertex1.x, (float) vertex1.y, (float) vertex1.z).color(color).next();
+        //buf.vertex(matrix, (float) vertex2.x, (float) vertex2.y, (float) vertex2.z).color(color).next();
+        //buf.vertex(matrix, (float) vertex3.x, (float) vertex3.y, (float) vertex3.z).color(color).next();
+        //RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        //RenderSystem.disableCull();
+        //tess.draw();
+        //RenderSystem.enableCull();
+
+        //TODO 1.21 - 1.21.8
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        buf.vertex(matrix, (float) vertex0.x, (float) vertex0.y, (float) vertex0.z).color(color);
+        buf.vertex(matrix, (float) vertex1.x, (float) vertex1.y, (float) vertex1.z).color(color);
+        buf.vertex(matrix, (float) vertex2.x, (float) vertex2.y, (float) vertex2.z).color(color);
+        buf.vertex(matrix, (float) vertex3.x, (float) vertex3.y, (float) vertex3.z).color(color);
+        RenderLayer.getDebugQuads().draw(buf.end());
     }
 }

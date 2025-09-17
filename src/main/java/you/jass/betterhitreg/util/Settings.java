@@ -23,11 +23,14 @@ public class Settings {
         defaults.setProperty("hideEnchantParticles", "false");
         defaults.setProperty("particlesEveryHit", "false");
         defaults.setProperty("hideAnimations", "false");
+        defaults.setProperty("hideArmor", "false");
         defaults.setProperty("silenceOtherFights", "false");
+        defaults.setProperty("silenceNonHits", "false");
         defaults.setProperty("silenceSelf", "false");
         defaults.setProperty("silenceThem", "false");
         defaults.setProperty("hideOtherFights", "false");
         defaults.setProperty("muffledHitsounds", "false");
+        defaults.setProperty("renderHitbox", "false");
         defaults.setProperty("safeRegsOnly", "true");
         defaults.setProperty("tutorial", "true");
         properties.putAll(defaults);
@@ -43,11 +46,14 @@ public class Settings {
     public static boolean isHideEnchantParticles() {return Boolean.parseBoolean(get("hideEnchantParticles"));}
     public static boolean isParticlesEveryHit() {return Boolean.parseBoolean(get("particlesEveryHit"));}
     public static boolean isHideAnimations() {return Boolean.parseBoolean(get("hideAnimations"));}
+    public static boolean isHideArmor() {return Boolean.parseBoolean(get("hideArmor"));}
     public static boolean isSilenceOtherFights() {return Boolean.parseBoolean(get("silenceOtherFights"));}
+    public static boolean isSilenceNonHits() {return Boolean.parseBoolean(get("silenceNonHits"));}
     public static boolean isSilenceSelf() {return Boolean.parseBoolean(get("silenceSelf"));}
     public static boolean isSilenceThem() {return Boolean.parseBoolean(get("silenceThem"));}
     public static boolean isHideOtherFights() {return Boolean.parseBoolean(get("hideOtherFights"));}
     public static boolean isMuffledHitsounds() {return Boolean.parseBoolean(get("muffledHitsounds"));}
+    public static boolean isRenderHitbox() {return Boolean.parseBoolean(get("renderHitbox"));}
     public static boolean isSafeRegsOnly() {return Boolean.parseBoolean(get("safeRegsOnly"));}
     public static boolean isTutorial() {return Boolean.parseBoolean(get("tutorial"));}
 

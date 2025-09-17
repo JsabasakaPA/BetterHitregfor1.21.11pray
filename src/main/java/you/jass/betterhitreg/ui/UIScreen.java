@@ -4,7 +4,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import you.jass.betterhitreg.BetterHitreg;
 import you.jass.betterhitreg.hitreg.Hitreg;
 import you.jass.betterhitreg.util.Settings;
 
@@ -38,28 +37,32 @@ public class UIScreen extends Screen {
 
         widgets.clear();
 
+        int hsize = 150;
+        int vsize = 260;
+        int vertical = vsize / 2;
+        int horizontal = hsize / 2;
         int centerX = width / 2;
         int centerY = height / 2;
-        int start = 110;
-        int vgap = 13;
+        int start = vertical - 10;
+        int vgap = 12;
         int hgap = 120;
         int sgap = 16;
         int swidth = 77;
         int sstart = 35;
         int textAlignment = 66;
 
-        widgets.add(new UIPanel(centerX - 75, centerY - 120, 150, 240, panel, false));
+        widgets.add(new UIPanel(centerX - horizontal, centerY - vertical, hsize, vsize, panel, false));
 
         widgets.add(new UILabel(
                 centerX,
-                centerY - 110,
+                centerY - vertical + 10,
                 textRenderer, "BetterHitreg v1.0.0",
                 header, true, true
         ));
 
         widgets.add(new UILabel(
                 centerX,
-                centerY + 113,
+                centerY + vertical - 10,
                 textRenderer, "Made by Jass",
                 footer, true, true
         ));
@@ -135,6 +138,16 @@ public class UIScreen extends Screen {
                 centerX - textAlignment,
                 centerY - start + vgap * 7,
                 10, hgap,
+                textRenderer, "Hide Armor",
+                checkbox, false,
+                Settings.isHideArmor(),
+                checked -> Settings.toggle("hideArmor")
+        ));
+
+        widgets.add(new UICheckbox(
+                centerX - textAlignment,
+                centerY - start + vgap * 8,
+                10, hgap,
                 textRenderer, "Hide Crit Particles",
                 checkbox, false,
                 Settings.isHideCritParticles(),
@@ -143,7 +156,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 8,
+                centerY - start + vgap * 9,
                 10, hgap,
                 textRenderer, "Hide Enchant Particles",
                 checkbox, false,
@@ -153,7 +166,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 9,
+                centerY - start + vgap * 10,
                 10, hgap,
                 textRenderer, "Always Hit Particles",
                 checkbox, false,
@@ -163,9 +176,9 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 10,
+                centerY - start + vgap * 11,
                 10, hgap,
-                textRenderer, "1.8 Sounds",
+                textRenderer, "1.8 Hit Sounds",
                 checkbox, false,
                 Settings.isLegacySounds(),
                 checked -> Settings.toggle("legacySounds")
@@ -173,7 +186,17 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 11,
+                centerY - start + vgap * 12,
+                10, hgap,
+                textRenderer, "Mute Non-hit Sounds",
+                checkbox, false,
+                Settings.isSilenceNonHits(),
+                checked -> Settings.toggle("silenceNonHits")
+        ));
+
+        widgets.add(new UICheckbox(
+                centerX - textAlignment,
+                centerY - start + vgap * 13,
                 10, hgap,
                 textRenderer, "Mute Your Hits",
                 checkbox, false,
@@ -183,7 +206,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 12,
+                centerY - start + vgap * 14,
                 10, hgap,
                 textRenderer, "Mute Their Hits",
                 checkbox, false,
@@ -193,7 +216,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 13,
+                centerY - start + vgap * 15,
                 10, hgap,
                 textRenderer, "Muffled Hit Sounds",
                 checkbox, false,
@@ -203,7 +226,17 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 14,
+                centerY - start + vgap * 16,
+                10, hgap,
+                textRenderer, "Render Target Hitbox",
+                checkbox, false,
+                Settings.isRenderHitbox(),
+                checked -> Settings.toggle("renderHitbox")
+        ));
+
+        widgets.add(new UICheckbox(
+                centerX - textAlignment,
+                centerY - start + vgap * 17,
                 10, hgap,
                 textRenderer, "Alert Delays (" + Hitreg.last100Regs.getAverageDelay() + "ms)",
                 checkbox, false,
@@ -213,7 +246,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
-                centerY - start + vgap * 15,
+                centerY - start + vgap * 18,
                 10, hgap,
                 textRenderer, "Alert Ghosts (" + Hitreg.last100Regs.getGhostRatio() + "%)",
                 checkbox, false,
@@ -223,7 +256,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UILabel(
                 centerX,
-                centerY - start + vgap * 16,
+                centerY - start + vgap * 19,
                 textRenderer, "You: " + (Hitreg.getPlayersPing() > -1 ? Hitreg.getPlayersPing() : "?") + "ᴍs"
                 + " Them: " + (Hitreg.getTargetsPing() > -1 ? Hitreg.getTargetsPing() : "?") + "ᴍs",
                 label, false, true
@@ -239,7 +272,7 @@ public class UIScreen extends Screen {
 //
 //        super.render(matrixStack, mouseX, mouseY, delta);
 //    }
-//
+
 //    @Override
 //    public void renderBackground(MatrixStack matrixStack) {}
 
@@ -255,6 +288,10 @@ public class UIScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {}
+
+    //TODO 1.20 - 1.20.1
+//    @Override
+//    public void renderBackground(DrawContext context) {}
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
