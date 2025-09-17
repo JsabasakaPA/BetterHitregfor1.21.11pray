@@ -20,7 +20,7 @@ public class Commands {
                         .then(ClientCommandManager.literal("legacySounds").executes(context -> toggle("1.8 sounds")))
                         .then(ClientCommandManager.literal("hideAnimations").executes(context -> toggle("hide animations")))
                         .then(ClientCommandManager.literal("hideArmor").executes(context -> toggle("hide armor")))
-                        .then(ClientCommandManager.literal("hideCritParticles").executes(context -> toggle("hide crit particles")))
+                        .then(ClientCommandManager.literal("hideAllParticles").executes(context -> toggle("hide crit particles")))
                         .then(ClientCommandManager.literal("hideEnchantParticles").executes(context -> toggle("hide enchant particles")))
                         .then(ClientCommandManager.literal("particlesEveryHit").executes(context -> toggle("particles on every hit")))
                         .then(ClientCommandManager.literal("silenceOtherFights").executes(context -> toggle("silence other fights")))
@@ -43,8 +43,8 @@ public class Commands {
         message("1.8 sounds: " + onOrOff(Settings.isLegacySounds()), "/hitreg legacySounds");
         message("hide animations: " + onOrOff(Settings.isHideAnimations()), "/hitreg hideAnimations");
         message("hide armor: " + onOrOff(Settings.isHideArmor()), "/hitreg hideArmor");
-        message("hide crit particles: " + onOrOff(Settings.isHideCritParticles()), "/hitreg hideEnchantParticles");
-        message("hide enchant particles: " + onOrOff(Settings.isHideEnchantParticles()), "/hitreg hideCritParticles");
+        message("hide crit particles: " + onOrOff(Settings.isHideAllParticles()), "/hitreg hideEnchantParticles");
+        message("hide enchant particles: " + onOrOff(Settings.isHideEnchantParticles()), "/hitreg hideAllParticles");
         message("particles on every hit: " + onOrOff(Settings.isParticlesEveryHit()), "/hitreg particlesEveryHit");
         message("silence other fights: " + onOrOff(Settings.isSilenceOtherFights()), "/hitreg silenceOtherFights");
         message("silence your hits: " + onOrOff(Settings.isSilenceSelf()), "/hitreg silenceSelf");
@@ -70,7 +70,7 @@ public class Commands {
             case "1.8 sounds" -> "legacySounds";
             case "hide animations" -> "hideAnimations";
             case "hide armor" -> "hideArmor";
-            case "hide crit particles" -> "hideCritParticles";
+            case "hide all particles" -> "hideAllParticles";
             case "hide enchant particles" -> "hideEnchantParticles";
             case "particles on every hit" -> "particlesEveryHit";
             case "silence other fights" -> "silenceOtherFights";

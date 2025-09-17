@@ -19,7 +19,7 @@ public class Settings {
         defaults.setProperty("alertDelays", "false");
         defaults.setProperty("alertGhosts", "true");
         defaults.setProperty("legacySounds", "false");
-        defaults.setProperty("hideCritParticles", "false");
+        defaults.setProperty("hideAllParticles", "false");
         defaults.setProperty("hideEnchantParticles", "false");
         defaults.setProperty("particlesEveryHit", "false");
         defaults.setProperty("hideAnimations", "false");
@@ -42,7 +42,7 @@ public class Settings {
     public static boolean isAlertDelays() {return Boolean.parseBoolean(get("alertDelays"));}
     public static boolean isAlertGhosts() {return Boolean.parseBoolean(get("alertGhosts"));}
     public static boolean isLegacySounds() {return Boolean.parseBoolean(get("legacySounds"));}
-    public static boolean isHideCritParticles() {return Boolean.parseBoolean(get("hideCritParticles"));}
+    public static boolean isHideAllParticles() {return Boolean.parseBoolean(get("hideAllParticles"));}
     public static boolean isHideEnchantParticles() {return Boolean.parseBoolean(get("hideEnchantParticles"));}
     public static boolean isParticlesEveryHit() {return Boolean.parseBoolean(get("particlesEveryHit"));}
     public static boolean isHideAnimations() {return Boolean.parseBoolean(get("hideAnimations"));}

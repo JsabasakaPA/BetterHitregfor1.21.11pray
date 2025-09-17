@@ -148,10 +148,10 @@ public class UIScreen extends Screen {
                 centerX - textAlignment,
                 centerY - start + vgap * 8,
                 10, hgap,
-                textRenderer, "Hide Crit Particles",
+                textRenderer, "Hide All Particles",
                 checkbox, false,
-                Settings.isHideCritParticles(),
-                checked -> Settings.toggle("hideCritParticles")
+                Settings.isHideAllParticles(),
+                checked -> Settings.toggle("hideAllParticles")
         ));
 
         widgets.add(new UICheckbox(
