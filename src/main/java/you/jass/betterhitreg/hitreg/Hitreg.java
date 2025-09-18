@@ -66,9 +66,10 @@ public class Hitreg {
         Entity entity = client.world.getEntityById(lastEntity);
         if (entity == null) return;
 
-        if (!hitEarly && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
-
-        if (enchanted || Settings.isParticlesEveryHit()) playParticles("ENCHANTED_HIT", entity);
+        if (!Settings.isHideAllParticles()) {
+            if (!hitEarly && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
+            if (!Settings.isHideEnchantParticles() && (enchanted || Settings.isParticlesEveryHit())) playParticles("ENCHANTED_HIT", entity);
+        }
 
         if (!Settings.isHideAnimations() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());
 
@@ -128,10 +129,32 @@ public class Hitreg {
     }
 
     public static boolean withinFight() {
-        return targetEntity == null || client.player == null || !(client.player.squaredDistanceTo(targetEntity) > 30);
+        return distanceToTarget() <= 30 && bothAlive();
     }
 
     public static boolean bothAlive() {
         return targetEntity != null && client.player != null && client.player.isAlive() && targetEntity.isAlive();
+    }
+
+    public static double distanceToTarget() {
+        if (client.player == null || targetEntity == null) return 999;
+        return distanceFrom(client.player.getPos(), targetEntity.getPos());
+    }
+
+    public static double distanceFromPlayer(Vec3d position) {
+        if (client.player == null) return 999;
+        return distanceFrom(client.player.getPos(), position);
+    }
+
+    public static double distanceFromTarget(Vec3d position) {
+        if (targetEntity == null) return 999;
+        return distanceFrom(targetEntity.getPos(), position);
+    }
+
+    public static double distanceFrom(Vec3d a, Vec3d b) {
+        if (a == null || b == null) return 999;
+        double dx = a.x - b.x;
+        double dz = a.z - b.z;
+        return dx * dx + dz * dz;
     }
 }

@@ -25,8 +25,7 @@ public class Sound {
     }
 
     public boolean withinFight() {
-        double distance = client.player != null ? client.player.squaredDistanceTo(location.x, location.y, location.z) : 0;
-        return distance <= 30;
+        return distanceFromPlayer(location) <= 30 || distanceFromTarget(location) <= 30;
     }
 
     public boolean wasRecent() {
@@ -40,12 +39,12 @@ public class Sound {
     public boolean wasFromYou() {
         long you = distanceFromTimestamp(lastAnimation);
         long them = distanceFromTimestamp(lastAttacked);
-        return you <= 5 && you <= them;
+        return you <= 15 && you <= them;
     }
 
     public boolean wasFromThem() {
         long you = distanceFromTimestamp(lastAnimation);
         long them = distanceFromTimestamp(lastAttacked);
-        return them <= 5 && them <= you;
+        return them <= 15 && them <= you;
     }
 }

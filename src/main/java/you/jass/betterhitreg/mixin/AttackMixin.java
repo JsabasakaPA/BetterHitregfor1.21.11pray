@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import you.jass.betterhitreg.hitreg.Hitreg;
 import you.jass.betterhitreg.util.Settings;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.*;
@@ -23,7 +24,7 @@ public abstract class AttackMixin {
         lastEntity = entity.getId();
         targetEntity = entity;
         lastAttack = System.currentTimeMillis();
-        nextAttack = lastAttack + Settings.getHitreg();
+        nextAttack = Hitreg.isToggled() ? lastAttack + Settings.getHitreg() : -1;
         if (!hitEarly) {
             newTarget = lastEntity != entity.getId();
             lastProperAttack = System.currentTimeMillis();

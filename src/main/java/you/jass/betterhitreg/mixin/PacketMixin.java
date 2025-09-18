@@ -31,14 +31,14 @@ public abstract class PacketMixin {
 
             if (lastEntity == damagePacket.entityId()) {
                 long delay = System.currentTimeMillis() - lastProperAttack;
-                if (Settings.isAlertDelays() && !alreadyAnimated && delay <= 500) message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays");
+                if (Settings.isAlertDelays() && !alreadyAnimated && delay <= 500) client.execute(() -> message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays"));
                 if (wasGhosted || delay <= 500) last100Regs.add(!wasGhosted ? (int) delay : -1);
                 lastAnimation = System.currentTimeMillis();
                 alreadyAnimated = true;
                 registered = true;
                 wasGhosted = false;
                 if (isToggled && withinFight) ci.cancel();
-                if (!isToggled && withinFight && Settings.isParticlesEveryHit()) playParticles("ENCHANTED_HIT", targetEntity);
+                if (!isToggled && withinFight && Settings.isParticlesEveryHit()) client.execute(() -> playParticles("ENCHANTED_HIT", targetEntity));
                 processDelayedSounds();
             }
 
@@ -63,7 +63,7 @@ public abstract class PacketMixin {
         }
 
         else if (packet instanceof PlaySoundS2CPacket soundPacket) {
-            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceNonHits() || Settings.isSilenceSelf() || Settings.isSilenceThem());
+            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceSelf() || Settings.isSilenceThem());
             if (vanilla) return;
 
             Sound sound = new Sound(soundPacket);
@@ -110,6 +110,14 @@ public abstract class PacketMixin {
         //block the sound based on whether you hit them or they hit you
         if (sound.wasFromYou() && (isToggled || Settings.isSilenceSelf())) return false;
         if (sound.wasFromThem() && Settings.isSilenceThem()) return false;
+
+        if (soundWithinFight && !sound.wasFromYou() && !sound.wasFromThem()) {
+            boolean u = sound.wasFromYou();
+            boolean t = sound.wasFromThem();
+            long d = sound.distanceFromTimestamp(lastAnimation);
+            long e = sound.distanceFromTimestamp(lastAttacked);
+            client.execute(() -> message( u + " " + d + " " + t + " " + e + " " + sound.sound, ""));
+        }
 
         //if the sound wasn't from either of you
         if (!sound.wasFromYou() && !sound.wasFromThem()) {
