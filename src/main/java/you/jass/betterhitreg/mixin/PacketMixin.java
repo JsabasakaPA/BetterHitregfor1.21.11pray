@@ -111,14 +111,6 @@ public abstract class PacketMixin {
         if (sound.wasFromYou() && (isToggled || Settings.isSilenceSelf())) return false;
         if (sound.wasFromThem() && Settings.isSilenceThem()) return false;
 
-        if (soundWithinFight && !sound.wasFromYou() && !sound.wasFromThem()) {
-            boolean u = sound.wasFromYou();
-            boolean t = sound.wasFromThem();
-            long d = sound.distanceFromTimestamp(lastAnimation);
-            long e = sound.distanceFromTimestamp(lastAttacked);
-            client.execute(() -> message( u + " " + d + " " + t + " " + e + " " + sound.sound, ""));
-        }
-
         //if the sound wasn't from either of you
         if (!sound.wasFromYou() && !sound.wasFromThem()) {
             //delay knockback sounds because for some reason knockback sounds come before hit registration on most servers
