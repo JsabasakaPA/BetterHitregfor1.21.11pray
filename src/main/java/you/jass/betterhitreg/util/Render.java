@@ -1,6 +1,5 @@
 package you.jass.betterhitreg.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,15 +9,16 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 import you.jass.betterhitreg.settings.Toggle;
-
-import java.awt.*;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
 import static you.jass.betterhitreg.hitreg.Hitreg.targetEntity;
 
 public class Render {
+    private static final int WHITE = 0xFFFFFFFF;
+    private static final int RED = 0xFFFF0000;
+    private static final int DARK_RED = 0xFF640000;
+
     public static void render(WorldRenderContext context) {
         boolean isHitbox = Toggle.RENDER_HITBOX.toggled();
         boolean isCross = Toggle.RENDER_CROSS.toggled();
@@ -27,12 +27,12 @@ public class Render {
         Box target = getBoundingBox(targetEntity);
         boolean inRange = client.player.getEyePos().squaredDistanceTo(closest) <= 9;
 
-        Color hitbox = inRange ? new Color(255, 0, 0) : new Color(255, 255, 255);
-        Color cross = inRange ? new Color(100, 0, 0) : new Color(255, 0, 0);
+        int hitbox = inRange ? RED : WHITE;
+        int cross = inRange ? DARK_RED : RED;
 
         if (isCross && !isHitbox) cross = hitbox;
-        if (isHitbox) box(context, target, 3, hitbox.getRGB());
-        if (isCross) cross(context, target, closest, 3, cross.getRGB());
+        if (isHitbox) box(context, target, 3, hitbox);
+        if (isCross) cross(context, target, closest, 3, cross);
     }
 
     public static Box getBoundingBox(Entity entity) {
