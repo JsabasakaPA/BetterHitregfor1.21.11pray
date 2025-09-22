@@ -14,16 +14,16 @@ public class Commands {
 
             for (Toggle toggle : Toggle.values()) {
                 root = root.then(ClientCommandManager.literal(toggle.key())
-                        .executes(context -> {
-                            toggle.toggle();
-                            return 1;
-                        }));
+                .executes(context -> {
+                   toggle.toggle();
+                   return 1;
+                }));
             }
 
             root = root.then(ClientCommandManager.literal("set")
-                    .then(argument("value", IntegerArgumentType.integer())
-                            .executes(context -> set(IntegerArgumentType.getInteger(context, "value"))))
-                    .executes(context -> set(0)));
+                   .then(argument("value", IntegerArgumentType.integer())
+                   .executes(context -> set(IntegerArgumentType.getInteger(context, "value"))))
+                   .executes(context -> set(0)));
 
             dispatcher.register(root.executes(context -> guide()));
         });
