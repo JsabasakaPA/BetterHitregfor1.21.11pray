@@ -6,7 +6,7 @@ import net.minecraft.sound.SoundEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import you.jass.betterhitreg.util.Settings;
+import you.jass.betterhitreg.settings.Toggle;
 
 @Mixin(LivingEntity.class)
 public abstract class DamageMixin {
@@ -16,6 +16,6 @@ public abstract class DamageMixin {
         ordinal = 0
     )
     private SoundEvent onDamaged(SoundEvent original, DamageSource damageSource) {
-        return Settings.isSilenceThem() ? null : original;
+        return Toggle.SILENCE_THEM.toggled() ? null : original;
     }
 }

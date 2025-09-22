@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import you.jass.betterhitreg.hitreg.Hitreg;
-import you.jass.betterhitreg.util.Settings;
+import you.jass.betterhitreg.settings.Settings;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.*;
 

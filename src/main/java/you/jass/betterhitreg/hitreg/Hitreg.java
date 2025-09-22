@@ -6,13 +6,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
-import you.jass.betterhitreg.util.Commands;
+import you.jass.betterhitreg.settings.Commands;
+import you.jass.betterhitreg.settings.Settings;
+import you.jass.betterhitreg.settings.Toggle;
 import you.jass.betterhitreg.util.MultiVersion;
 import you.jass.betterhitreg.util.RegQueue;
-import you.jass.betterhitreg.util.Settings;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static you.jass.betterhitreg.util.MultiVersion.message;
@@ -49,7 +48,7 @@ public class Hitreg {
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
 
         if (!wasGhosted && !newTarget && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 450) {
-            if (Settings.isAlertGhosts()) message("hit §7was §cghosted", "/hitreg alertGhosts");
+            if (Toggle.ALERT_GHOSTS.toggled()) message("hit §7was §cghosted", "/hitreg alertGhosts");
             registered = true;
             wasGhosted = true;
         }
@@ -66,17 +65,17 @@ public class Hitreg {
         Entity entity = client.world.getEntityById(lastEntity);
         if (entity == null) return;
 
-        if (!Settings.isHideAllParticles()) {
+        if (!Toggle.HIDE_ALL_PARTICLES.toggled()) {
             if (!hitEarly && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
-            if (!Settings.isHideEnchantParticles() && (enchanted || Settings.isParticlesEveryHit())) playParticles("ENCHANTED_HIT", entity);
+            if (!Toggle.HIDE_ENCHANT_PARTICLES.toggled() && (enchanted || Toggle.PARTICLES_EVERY_HIT.toggled())) playParticles("ENCHANTED_HIT", entity);
         }
 
-        if (!Settings.isHideAnimations() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());
+        if (!Toggle.HIDE_ANIMATIONS.toggled() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());
 
-        if (!Settings.isSilenceSelf()) {
+        if (!Toggle.SILENCE_SELF.toggled()) {
             Vec3d location = MultiVersion.getPosition(entity);
 
-            if (Settings.isLegacySounds() && !hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+            if (Toggle.LEGACY_SOUNDS.toggled() && !hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
 
             else if (hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
 
@@ -123,8 +122,8 @@ public class Hitreg {
     }
 
     public static boolean isToggled() {
-        if (!Settings.isToggled()) return false;
-        if (Settings.isSafeRegsOnly() && (newTarget || wasGhosted)) return false;
+        if (!Toggle.TOGGLE.toggled()) return false;
+        if (Toggle.SAFE_REGS_ONLY.toggled() && (newTarget || wasGhosted)) return false;
         return true;
     }
 

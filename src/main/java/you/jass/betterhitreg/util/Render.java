@@ -11,6 +11,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import you.jass.betterhitreg.settings.Toggle;
 
 import java.awt.*;
 
@@ -18,10 +19,20 @@ import static you.jass.betterhitreg.hitreg.Hitreg.client;
 import static you.jass.betterhitreg.hitreg.Hitreg.targetEntity;
 
 public class Render {
-    public static void hitbox(WorldRenderContext context) {
-        if (!Settings.isRenderHitbox() || targetEntity == null || !targetEntity.isAlive()) return;
-        box(context, getBoundingBox(targetEntity), 3, new Color(255, 255, 255).getRGB());
-        cross(context, getBoundingBox(targetEntity), getClosestPoint(client.player, targetEntity), 3, new Color(255, 0, 0).getRGB());
+    public static void render(WorldRenderContext context) {
+        boolean isHitbox = Toggle.RENDER_HITBOX.toggled();
+        boolean isCross = Toggle.RENDER_CROSS.toggled();
+        if ((!isHitbox && !isCross) || targetEntity == null || !targetEntity.isAlive() || client.player == null) return;
+        Vec3d closest = getClosestPoint(client.player, targetEntity);
+        Box target = getBoundingBox(targetEntity);
+        boolean inRange = client.player.getEyePos().squaredDistanceTo(closest) <= 9;
+
+        Color hitbox = inRange ? new Color(255, 0, 0) : new Color(255, 255, 255);
+        Color cross = inRange ? new Color(100, 0, 0) : new Color(255, 0, 0);
+
+        if (isCross && !isHitbox) cross = hitbox;
+        if (isHitbox) box(context, target, 3, hitbox.getRGB());
+        if (isCross) cross(context, target, closest, 3, cross.getRGB());
     }
 
     public static Box getBoundingBox(Entity entity) {

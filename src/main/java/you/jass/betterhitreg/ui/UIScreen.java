@@ -2,10 +2,10 @@ package you.jass.betterhitreg.ui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import you.jass.betterhitreg.hitreg.Hitreg;
-import you.jass.betterhitreg.util.Settings;
+import you.jass.betterhitreg.settings.Settings;
+import you.jass.betterhitreg.settings.Toggle;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class UIScreen extends Screen {
         widgets.clear();
 
         int hsize = 150;
-        int vsize = 260;
+        int vsize = 270;
         int vertical = vsize / 2;
         int horizontal = hsize / 2;
         int centerX = width / 2;
@@ -62,7 +62,7 @@ public class UIScreen extends Screen {
 
         widgets.add(new UILabel(
                 centerX,
-                centerY + vertical - 10,
+                centerY + vertical - 7,
                 textRenderer, "Made by Jass",
                 footer, true, true
         ));
@@ -90,8 +90,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Enabled",
                 checkbox, false,
-                Settings.isToggled(),
-                checked -> Settings.toggle("toggled")
+                Toggle.TOGGLE.toggled(),
+                checked -> Toggle.TOGGLE.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -100,8 +100,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Safe Regs Only",
                 checkbox, false,
-                Settings.isSafeRegsOnly(),
-                checked -> Settings.toggle("safeRegsOnly")
+                Toggle.SAFE_REGS_ONLY.toggled(),
+                checked -> Toggle.SAFE_REGS_ONLY.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -110,8 +110,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Mute Other Fights",
                 checkbox, false,
-                Settings.isSilenceOtherFights(),
-                checked -> Settings.toggle("silenceOtherFights")
+                Toggle.SILENCE_OTHER_FIGHTS.toggled(),
+                checked -> Toggle.SILENCE_OTHER_FIGHTS.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -120,8 +120,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Hide Other Fights",
                 checkbox, false,
-                Settings.isHideOtherFights(),
-                checked -> Settings.toggle("hideOtherFights")
+                Toggle.HIDE_OTHER_FIGHTS.toggled(),
+                checked -> Toggle.HIDE_OTHER_FIGHTS.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -130,8 +130,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Hide Animations",
                 checkbox, false,
-                Settings.isHideAnimations(),
-                checked -> Settings.toggle("hideAnimations")
+                Toggle.HIDE_ANIMATIONS.toggled(),
+                checked -> Toggle.HIDE_ANIMATIONS.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -140,8 +140,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Hide Armor",
                 checkbox, false,
-                Settings.isHideArmor(),
-                checked -> Settings.toggle("hideArmor")
+                Toggle.HIDE_ARMOR.toggled(),
+                checked -> Toggle.HIDE_ARMOR.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -150,8 +150,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Hide All Particles",
                 checkbox, false,
-                Settings.isHideAllParticles(),
-                checked -> Settings.toggle("hideAllParticles")
+                Toggle.HIDE_ALL_PARTICLES.toggled(),
+                checked -> Toggle.HIDE_ALL_PARTICLES.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -160,8 +160,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Hide Enchant Particles",
                 checkbox, false,
-                Settings.isHideEnchantParticles(),
-                checked -> Settings.toggle("hideEnchantParticles")
+                Toggle.HIDE_ENCHANT_PARTICLES.toggled(),
+                checked -> Toggle.HIDE_ENCHANT_PARTICLES.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -170,8 +170,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Always Hit Particles",
                 checkbox, false,
-                Settings.isParticlesEveryHit(),
-                checked -> Settings.toggle("particlesEveryHit")
+                Toggle.PARTICLES_EVERY_HIT.toggled(),
+                checked -> Toggle.PARTICLES_EVERY_HIT.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -180,8 +180,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "1.8 Hit Sounds",
                 checkbox, false,
-                Settings.isLegacySounds(),
-                checked -> Settings.toggle("legacySounds")
+                Toggle.LEGACY_SOUNDS.toggled(),
+                checked -> Toggle.LEGACY_SOUNDS.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -190,8 +190,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Mute Non-hit Sounds",
                 checkbox, false,
-                Settings.isSilenceNonHits(),
-                checked -> Settings.toggle("silenceNonHits")
+                Toggle.SILENCE_NON_HITS.toggled(),
+                checked -> Toggle.SILENCE_NON_HITS.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -200,8 +200,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Mute Your Hits",
                 checkbox, false,
-                Settings.isSilenceSelf(),
-                checked -> Settings.toggle("silenceSelf")
+                Toggle.SILENCE_SELF.toggled(),
+                checked -> Toggle.SILENCE_SELF.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -210,8 +210,8 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Mute Their Hits",
                 checkbox, false,
-                Settings.isSilenceThem(),
-                checked -> Settings.toggle("silenceThem")
+                Toggle.SILENCE_THEM.toggled(),
+                checked -> Toggle.SILENCE_THEM.toggle()
         ));
 
         widgets.add(new UICheckbox(
@@ -220,43 +220,53 @@ public class UIScreen extends Screen {
                 10, hgap,
                 textRenderer, "Muffled Hit Sounds",
                 checkbox, false,
-                Settings.isMuffledHitsounds(),
-                checked -> Settings.toggle("muffledHitsounds")
+                Toggle.MUFFLED_HITSOUNDS.toggled(),
+                checked -> Toggle.MUFFLED_HITSOUNDS.toggle()
         ));
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
                 centerY - start + vgap * 16,
                 10, hgap,
-                textRenderer, "Render Target Hitbox",
+                textRenderer, "Alert Delays (" + Hitreg.last100Regs.getAverageDelay() + "ms)",
                 checkbox, false,
-                Settings.isRenderHitbox(),
-                checked -> Settings.toggle("renderHitbox")
+                Toggle.ALERT_DELAYS.toggled(),
+                checked -> Toggle.ALERT_DELAYS.toggle()
         ));
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
                 centerY - start + vgap * 17,
                 10, hgap,
-                textRenderer, "Alert Delays (" + Hitreg.last100Regs.getAverageDelay() + "ms)",
+                textRenderer, "Alert Ghosts (" + Hitreg.last100Regs.getGhostRatio() + "%)",
                 checkbox, false,
-                Settings.isAlertDelays(),
-                checked -> Settings.toggle("alertDelays")
+                Toggle.ALERT_GHOSTS.toggled(),
+                checked -> Toggle.ALERT_GHOSTS.toggle()
         ));
 
         widgets.add(new UICheckbox(
                 centerX - textAlignment,
                 centerY - start + vgap * 18,
                 10, hgap,
-                textRenderer, "Alert Ghosts (" + Hitreg.last100Regs.getGhostRatio() + "%)",
+                textRenderer, "Render Target Hitbox",
                 checkbox, false,
-                Settings.isAlertGhosts(),
-                checked -> Settings.toggle("alertGhosts")
+                Toggle.RENDER_HITBOX.toggled(),
+                checked -> Toggle.RENDER_HITBOX.toggle()
+        ));
+
+        widgets.add(new UICheckbox(
+                centerX - textAlignment,
+                centerY - start + vgap * 19,
+                10, hgap,
+                textRenderer, "Render Target Cross",
+                checkbox, false,
+                Toggle.RENDER_CROSS.toggled(),
+                checked -> Toggle.RENDER_CROSS.toggle()
         ));
 
         widgets.add(new UILabel(
                 centerX,
-                centerY - start + vgap * 19,
+                centerY - start + vgap * 20,
                 textRenderer, "You: " + (Hitreg.getPlayersPing() > -1 ? Hitreg.getPlayersPing() : "?") + "ᴍs"
                 + " Them: " + (Hitreg.getTargetsPing() > -1 ? Hitreg.getTargetsPing() : "?") + "ᴍs",
                 label, false, true

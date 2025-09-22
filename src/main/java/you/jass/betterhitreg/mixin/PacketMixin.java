@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import you.jass.betterhitreg.util.Settings;
+import you.jass.betterhitreg.settings.Toggle;
 import you.jass.betterhitreg.util.Sound;
 
 import java.util.*;
@@ -27,18 +27,18 @@ public abstract class PacketMixin {
         boolean withinFight = withinFight();
 
         if (packet instanceof EntityDamageS2CPacket damagePacket) {
-            if (Settings.isHideAnimations()) ci.cancel();
+            if (Toggle.HIDE_ANIMATIONS.toggled()) ci.cancel();
 
             if (lastEntity == damagePacket.entityId()) {
                 long delay = System.currentTimeMillis() - lastProperAttack;
-                if (Settings.isAlertDelays() && !alreadyAnimated && delay <= 500) client.execute(() -> message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays"));
+                if (Toggle.ALERT_DELAYS.toggled() && !alreadyAnimated && delay <= 500) client.execute(() -> message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays"));
                 if (wasGhosted || delay <= 500) last100Regs.add(!wasGhosted ? (int) delay : -1);
                 lastAnimation = System.currentTimeMillis();
                 alreadyAnimated = true;
                 registered = true;
                 wasGhosted = false;
                 if (isToggled && withinFight) ci.cancel();
-                if (!isToggled && withinFight && Settings.isParticlesEveryHit()) client.execute(() -> playParticles("ENCHANTED_HIT", targetEntity));
+                if (!isToggled && withinFight && Toggle.PARTICLES_EVERY_HIT.toggled()) client.execute(() -> playParticles("ENCHANTED_HIT", targetEntity));
                 processDelayedSounds();
             }
 
@@ -58,12 +58,12 @@ public abstract class PacketMixin {
 
             //enchanted particle
             else if (animationPacket.getAnimationId() == 5) {
-                if ((Settings.isParticlesEveryHit() || isToggled) && withinFight) ci.cancel();
+                if ((Toggle.PARTICLES_EVERY_HIT.toggled() || isToggled) && withinFight) ci.cancel();
             }
         }
 
         else if (packet instanceof PlaySoundS2CPacket soundPacket) {
-            boolean vanilla = !(isToggled || Settings.isLegacySounds() || Settings.isSilenceOtherFights() || Settings.isSilenceSelf() || Settings.isSilenceThem());
+            boolean vanilla = !(isToggled || Toggle.LEGACY_SOUNDS.toggled() || Toggle.SILENCE_OTHER_FIGHTS.toggled() || Toggle.SILENCE_SELF.toggled() || Toggle.SILENCE_THEM.toggled());
             if (vanilla) return;
 
             Sound sound = new Sound(soundPacket);
@@ -96,20 +96,20 @@ public abstract class PacketMixin {
         boolean soundWithinFight = sound.withinFight();
 
         //block all non hit sounds in the player category if were muting them
-        if (sound.packet.getCategory() == SoundCategory.PLAYERS && (!sound.sound.contains("entity.player.attack") && !sound.sound.contains("entity.player.hurt"))) return !Settings.isSilenceNonHits();
+        if (sound.packet.getCategory() == SoundCategory.PLAYERS && (!sound.sound.contains("entity.player.attack") && !sound.sound.contains("entity.player.hurt"))) return !Toggle.SILENCE_NON_HITS.toggled();
 
         //block all modern attack sounds if legacy sounds are enabled
-        if (!sound.legacy && Settings.isLegacySounds() && !sound.sound.contains("hurt")) return false;
+        if (!sound.legacy && Toggle.LEGACY_SOUNDS.toggled() && !sound.sound.contains("hurt")) return false;
 
         //if the sound happened far away, then block it if were silencing other fights and skip it if were not
-        if (!playerWithinFight && !soundWithinFight) return !Settings.isSilenceOtherFights();
+        if (!playerWithinFight && !soundWithinFight) return !Toggle.SILENCE_OTHER_FIGHTS.toggled();
 
         //block nodamage sounds because they don't actually register hits so we don't know who they're from
         if (sound.sound.contains("nodamage")) return false;
 
         //block the sound based on whether you hit them or they hit you
-        if (sound.wasFromYou() && (isToggled || Settings.isSilenceSelf())) return false;
-        if (sound.wasFromThem() && Settings.isSilenceThem()) return false;
+        if (sound.wasFromYou() && (isToggled || Toggle.SILENCE_SELF.toggled())) return false;
+        if (sound.wasFromThem() && Toggle.SILENCE_THEM.toggled()) return false;
 
         //if the sound wasn't from either of you
         if (!sound.wasFromYou() && !sound.wasFromThem()) {
@@ -123,7 +123,7 @@ public abstract class PacketMixin {
             }
 
             //if it wasn't from either of you and were silencing other fights, silence it
-            if (Settings.isSilenceOtherFights()) return false;
+            if (Toggle.SILENCE_OTHER_FIGHTS.toggled()) return false;
         }
 
         return true;
