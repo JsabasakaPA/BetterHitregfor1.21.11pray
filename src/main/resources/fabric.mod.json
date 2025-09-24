@@ -5,7 +5,11 @@
   "name": "BetterHitreg",
   "description": "Clientside mod that registers hits before the server to make hitreg feel faster (use /hitreg to configure)",
   "authors": ["Jass"],
-  "contact": {},
+  "contact" : {
+    "homepage" : "https://modrinth.com/mod/betterhitreg",
+    "sources" : "https://github.com/jasspir/BetterHitreg",
+    "issues" : "https://github.com/jasspir/BetterHitreg/issues"
+  },
   "license": "Apache-2.0",
   "icon": "assets/betterhitreg/icon.png",
   "environment": "client",
@@ -21,5 +25,12 @@
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "custom" : {
+    "modmenu" : {
+      "links" : {
+        "modmenu.modrinth" : "https://modrinth.com/mod/betterhitreg"
+      }
+    }
   }
 }

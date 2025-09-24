@@ -1,14 +1,15 @@
 package you.jass.betterhitreg.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.*;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
@@ -17,6 +18,7 @@ import you.jass.betterhitreg.ui.UIUtils;
 import java.awt.*;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
+import static you.jass.betterhitreg.hitreg.Hitreg.enchanted;
 
 public class MultiVersion {
     public static Vec3d getPosition(Entity entity) {
@@ -98,6 +100,26 @@ public class MultiVersion {
 
         //TODO 1.21 - 1.21.8
         return packet.getEntityId();
+    }
+
+    public static boolean hasSharpness() {
+        if (client.player.getMainHandStack().hasEnchantments()) {
+            //TODO 1.19.4 - 1.20.4
+            //for (NbtElement enchantment : client.player.getMainHandStack().getEnchantments()) {
+            //if (enchantment.asString().contains("sharpness")) {
+            //return true;
+            //}
+            //}
+
+            //TODO 1.20.5 - 1.21.8
+            for (RegistryEntry<Enchantment> enchantment : client.player.getMainHandStack().getEnchantments().getEnchantments()) {
+                if (enchantment.getIdAsString().equalsIgnoreCase("minecraft:sharpness")) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static void drawRectangle(Object renderer, int x, int y, int w, int h, Color c) {

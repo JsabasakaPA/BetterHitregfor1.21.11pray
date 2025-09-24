@@ -2,6 +2,7 @@ package you.jass.betterhitreg.ui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import you.jass.betterhitreg.hitreg.Hitreg;
 import you.jass.betterhitreg.settings.Settings;
@@ -287,7 +288,7 @@ public class UIScreen extends Screen {
 //
 //        super.render(matrixStack, mouseX, mouseY, delta);
 //    }
-
+//
 //    @Override
 //    public void renderBackground(MatrixStack matrixStack) {}
 
