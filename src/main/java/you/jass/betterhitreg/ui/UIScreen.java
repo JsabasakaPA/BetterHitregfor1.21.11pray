@@ -158,10 +158,10 @@ public class UIScreen extends Screen {
                 centerX - textAlignment,
                 centerY - start + vgap * 9,
                 10, hgap,
-                textRenderer, "Hide Enchant Particles",
+                textRenderer, "Hide Other Particles",
                 checkbox, false,
-                Toggle.HIDE_ENCHANT_PARTICLES.toggled(),
-                checked -> Toggle.HIDE_ENCHANT_PARTICLES.toggle()
+                Toggle.HIDE_OTHER_PARTICLES.toggled(),
+                checked -> Toggle.HIDE_OTHER_PARTICLES.toggle()
         ));
 
         widgets.add(new UICheckbox(

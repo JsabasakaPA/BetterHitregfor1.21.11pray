@@ -1,7 +1,9 @@
 package you.jass.betterhitreg.mixin;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,17 +22,24 @@ public abstract class AttackMixin {
         sprinting = client.player.isSprinting();
         falling = client.player.getVelocity().getY() < -0.08;
         holdingSword = client.player.getMainHandStack().getName().getString().toLowerCase().contains("sword");
-        enchanted = client.player.getMainHandStack().hasEnchantments();
-        lastEntity = entity.getId();
         targetEntity = entity;
         lastAttack = System.currentTimeMillis();
         nextAttack = Hitreg.isToggled() ? lastAttack + Settings.getHitreg() : -1;
         if (!hitEarly) {
             newTarget = lastEntity != entity.getId();
+            lastEntity = entity.getId();
             lastProperAttack = System.currentTimeMillis();
             alreadyAnimated = false;
             alreadyKnockbacked = false;
             registered = false;
+        }
+        if (client.player.getMainHandStack().hasEnchantments()) {
+            for (RegistryEntry<Enchantment> enchantment : client.player.getMainHandStack().getEnchantments().getEnchantments()) {
+                if (enchantment.getIdAsString().equalsIgnoreCase("minecraft:sharpness")) {
+                    enchanted = true;
+                    break;
+                }
+            }
         }
     }
 }

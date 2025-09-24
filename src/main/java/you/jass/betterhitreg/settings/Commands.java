@@ -49,7 +49,7 @@ public class Commands {
     }
 
     public static String getUIKey() {
-        return you.jass.betterhitreg.BetterHitreg.UIKey.getBoundKeyTranslationKey()
+        return you.jass.betterhitreg.BetterHitreg.uiKey.getBoundKeyTranslationKey()
                 .replace("key.keyboard.", "")
                 .replace("key.mouse.", "")
                 .replace(".", " ")

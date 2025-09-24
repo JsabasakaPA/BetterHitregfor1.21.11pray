@@ -67,7 +67,7 @@ public class Hitreg {
 
         if (!Toggle.HIDE_ALL_PARTICLES.toggled()) {
             if (!hitEarly && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
-            if (!Toggle.HIDE_ENCHANT_PARTICLES.toggled() && (enchanted || Toggle.PARTICLES_EVERY_HIT.toggled())) playParticles("ENCHANTED_HIT", entity);
+            if (!Toggle.HIDE_OTHER_PARTICLES.toggled() && (enchanted || Toggle.PARTICLES_EVERY_HIT.toggled())) playParticles("ENCHANTED_HIT", entity);
         }
 
         if (!Toggle.HIDE_ANIMATIONS.toggled() && !hitEarly) entity.onDamaged(entity.getDamageSources().generic());

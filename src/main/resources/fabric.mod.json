@@ -6,7 +6,7 @@
   "description": "Clientside mod that registers hits before the server to make hitreg feel faster (use /hitreg to configure)",
   "authors": ["Jass"],
   "contact": {},
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "icon": "assets/betterhitreg/icon.png",
   "environment": "client",
   "entrypoints": {

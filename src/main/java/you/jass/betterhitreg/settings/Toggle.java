@@ -10,7 +10,7 @@ public enum Toggle {
     HIDE_ANIMATIONS("hideAnimations", "hide animations", false),
     HIDE_ARMOR("hideArmor", "hide armor", false),
     HIDE_ALL_PARTICLES("hideAllParticles", "hide crit particles", false),
-    HIDE_ENCHANT_PARTICLES("hideEnchantParticles", "hide enchant particles", false),
+    HIDE_OTHER_PARTICLES("hideOtherParticles", "only crit/sweep particles", false),
     PARTICLES_EVERY_HIT("particlesEveryHit", "particles on every hit", false),
     SILENCE_OTHER_FIGHTS("silenceOtherFights", "silence other fights", false),
     SILENCE_SELF("silenceSelf", "silence your hits", false),
