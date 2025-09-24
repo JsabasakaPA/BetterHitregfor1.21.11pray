@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static you.jass.betterhitreg.util.MultiVersion.message;
+
 public class UIScreen extends Screen {
     private final List<UIElement> widgets = new ArrayList<>();
 
@@ -81,7 +83,10 @@ public class UIScreen extends Screen {
                 "", "ᴍs",
                 textRenderer, slider, false,
                 v -> {},
-                v -> Settings.set("hitreg", String.valueOf(v))
+                v -> {
+                    Settings.set("hitreg", String.valueOf(v));
+                    message("hitreg §7set to §f" + v + "§7ms", "/hitreg set 0");
+                }
         ));
 
         widgets.add(new UICheckbox(
