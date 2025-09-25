@@ -1,7 +1,6 @@
 package you.jass.betterhitreg.util;
 
 import java.util.ArrayDeque;
-
 import java.util.Deque;
 
 public class RegQueue {
@@ -17,18 +16,19 @@ public class RegQueue {
         this.ghostQueue = new ArrayDeque<>(capacity);
     }
 
-    public void add(int value) {
+    public void addDelay(int value) {
         if (ghostQueue.size() == capacity && ghostQueue.removeFirst()) ghostCount--;
+        ghostQueue.addLast(false);
 
-        boolean isGhost = value == -1;
-        ghostQueue.addLast(isGhost);
-        if (isGhost) ghostCount++;
+        if (delayQueue.size() == capacity) delaySum -= delayQueue.removeFirst();
+        delayQueue.addLast(value);
+        delaySum += value;
+    }
 
-        if (!isGhost) {
-            if (delayQueue.size() == capacity) delaySum -= delayQueue.removeFirst();
-            delayQueue.addLast(value);
-            delaySum += value;
-        }
+    public void addGhost() {
+        if (ghostQueue.size() == capacity && ghostQueue.removeFirst()) ghostCount--;
+        ghostQueue.addLast(true);
+        ghostCount++;
     }
 
     public int getAverageDelay() {
@@ -38,7 +38,6 @@ public class RegQueue {
 
     public int getGhostRatio() {
         if (ghostQueue.isEmpty()) return 0;
-        return ghostCount / ghostQueue.size();
+        return (int) ((ghostCount * 100L) / ghostQueue.size());
     }
 }
-

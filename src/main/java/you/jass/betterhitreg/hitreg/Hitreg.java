@@ -26,6 +26,7 @@ public class Hitreg {
     public static long lastAnimation;
     public static long nextAttack = -1;
     public static boolean hitEarly;
+    public static boolean hitHadCooldown;
     public static boolean sprinting;
     public static boolean falling;
     public static boolean holdingSword;
@@ -47,8 +48,12 @@ public class Hitreg {
         wasSprinting = client.player.isSprinting();
         if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
 
-        if (!wasGhosted && !newTarget && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 450) {
-            if (Toggle.ALERT_GHOSTS.toggled()) message("hit §7was §cghosted", "/hitreg alertGhosts");
+        if (!wasGhosted && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 450) {
+            if (!newTarget) {
+                if (Toggle.ALERT_GHOSTS.toggled()) message("hit §7was §cghosted", "/hitreg alertGhosts");
+                last100Regs.addGhost();
+            }
+
             registered = true;
             wasGhosted = true;
         }
@@ -66,7 +71,7 @@ public class Hitreg {
         if (entity == null) return;
 
         if (!Toggle.HIDE_ALL_PARTICLES.toggled()) {
-            if (!hitEarly && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
+            if (!hitEarly && !hitHadCooldown && !(sprinting && sprintWasReset) && falling) playParticles("CRIT", entity);
             if (!Toggle.HIDE_OTHER_PARTICLES.toggled() && (enchanted || Toggle.PARTICLES_EVERY_HIT.toggled())) playParticles("ENCHANTED_HIT", entity);
         }
 
@@ -77,7 +82,10 @@ public class Hitreg {
 
             if (Toggle.LEGACY_SOUNDS.toggled() && !hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
 
-            else if (hitEarly) client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, SoundCategory.PLAYERS, 1, 1);
+            else if (hitHadCooldown) {
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
+                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
+            }
 
             else if (sprinting && sprintWasReset) {
                 client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1, 1);
@@ -93,11 +101,6 @@ public class Hitreg {
             else if (holdingSword) {
                 client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
                 client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
-            }
-
-            else {
-                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1, 1);
-                client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
             }
         }
 

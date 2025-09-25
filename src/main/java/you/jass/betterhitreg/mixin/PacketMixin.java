@@ -32,7 +32,7 @@ public abstract class PacketMixin {
             if (lastEntity == damagePacket.entityId()) {
                 long delay = System.currentTimeMillis() - lastProperAttack;
                 if (Toggle.ALERT_DELAYS.toggled() && !alreadyAnimated && delay <= 500) client.execute(() -> message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays"));
-                if (wasGhosted || delay <= 500) last100Regs.add(!wasGhosted ? (int) delay : -1);
+                if (delay <= 500) last100Regs.addDelay((int) delay);
                 lastAnimation = System.currentTimeMillis();
                 alreadyAnimated = true;
                 registered = true;
