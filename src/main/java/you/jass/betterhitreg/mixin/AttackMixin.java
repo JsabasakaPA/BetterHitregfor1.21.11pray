@@ -29,6 +29,7 @@ public abstract class AttackMixin {
         if (client.player == null || !target.isAlive()) return;
         hitEarly = System.currentTimeMillis() - lastProperAttack <= 475;
         lastAttack = System.currentTimeMillis();
+
         if (!hitEarly) {
             hitHadCooldown = client.player.getAttackCooldownProgress(0.5f) <= 0.9f;
             sprinting = client.player.isSprinting();
@@ -42,10 +43,13 @@ public abstract class AttackMixin {
             alreadyAnimated = false;
             alreadyKnockbacked = false;
             registered = false;
+
             if (Hitreg.isToggled() && withinFight() && bothAlive()) {
                 boolean sprintReset = sprintWasReset;
                 Scheduler.schedule(Settings.getHitreg(), () -> Hitreg.run(sprintReset));
             }
+
+            sprintWasReset = false;
         } else {
             client.execute(() -> {
                 if (!Toggle.SILENCE_SELF.toggled()) {
