@@ -2,7 +2,7 @@
 
 ### Clientside fabric mod for 1.19.4 - 1.21.8 that registers hits before the server to make hitreg feel faster
 
-The mod is designed to work for any ping below 500, but it is especially useful for high ping players (100+), as the difference in hitreg delay will be much more noticeable. It allows your hits to be registered immediately instead of waiting for the server to register them, creating the feeling as if you were 0 ping
+The mod is designed to work for any ping below 500, but is especially useful for high ping players (100+), as the difference in hitreg delay will be much more noticeable. It allows your hits to be registered immediately instead of waiting for the server to register them, creating the feeling as if you were 0 ping
 
 > [!NOTE]
 >No instances of false flagging any anticheat or giving any technical advantage have been found
