@@ -18,6 +18,7 @@ import you.jass.betterhitreg.settings.Commands;
 import you.jass.betterhitreg.settings.Settings;
 import you.jass.betterhitreg.settings.Toggle;
 import you.jass.betterhitreg.util.MultiVersion;
+import you.jass.betterhitreg.util.Scheduler;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.*;
 
@@ -29,19 +30,19 @@ public abstract class AttackMixin {
         hitEarly = System.currentTimeMillis() - lastProperAttack <= 450;
         lastAttack = System.currentTimeMillis();
         if (!hitEarly) {
-            hitHadCooldown = client.player.getAttackCooldownProgress(0.5f) < 0.9;
+            hitHadCooldown = client.player.getAttackCooldownProgress(0.5f) <= 0.9f;
             sprinting = client.player.isSprinting();
             falling = client.player.getVelocity().getY() < -0.08;
-            holdingSword = client.player.getMainHandStack().getName().getString().toLowerCase().contains("sword");
+            holdingSword = client.player.getMainHandStack().getItem().getName().getString().toLowerCase().contains("sword");
             enchanted = MultiVersion.hasSharpness();
             targetEntity = target;
             newTarget = lastEntity != target.getId();
             lastEntity = target.getId();
-            nextAttack = Hitreg.isToggled() ? System.currentTimeMillis() + Settings.getHitreg() : -1;
             lastProperAttack = System.currentTimeMillis();
             alreadyAnimated = false;
             alreadyKnockbacked = false;
             registered = false;
+            if (Hitreg.isToggled() && withinFight() && bothAlive()) Scheduler.schedule(Settings.getHitreg(), Hitreg::run);
         } else {
             client.execute(() -> {
                 if (!Toggle.SILENCE_SELF.toggled()) {

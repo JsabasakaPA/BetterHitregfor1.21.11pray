@@ -3,6 +3,7 @@ package you.jass.betterhitreg.util;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
+import you.jass.betterhitreg.settings.Toggle;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.*;
 
@@ -36,15 +37,18 @@ public class Sound {
         return Math.abs(time - timestamp);
     }
 
+    //15ms was the highest amount of jitter that I found didn't affect other fights
+    //use 50ms for most cases except silencing other fights in case the user has an unstable connection
+
     public boolean wasFromYou() {
         long you = distanceFromTimestamp(lastAnimation);
         long them = distanceFromTimestamp(lastAttacked);
-        return you <= 15 && you <= them;
+        return you <= them && you <= (Toggle.SILENCE_OTHER_FIGHTS.toggled() ? 15 : 50);
     }
 
     public boolean wasFromThem() {
         long you = distanceFromTimestamp(lastAnimation);
         long them = distanceFromTimestamp(lastAttacked);
-        return them <= 15 && them <= you;
+        return them <= you && them <= (Toggle.SILENCE_OTHER_FIGHTS.toggled() ? 15 : 50);
     }
 }

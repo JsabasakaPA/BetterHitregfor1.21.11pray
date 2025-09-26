@@ -24,7 +24,6 @@ public class Hitreg {
     public static long lastAttack;
     public static long lastAttacked;
     public static long lastAnimation;
-    public static long nextAttack = -1;
     public static boolean hitEarly;
     public static boolean hitHadCooldown;
     public static boolean sprinting;
@@ -46,9 +45,8 @@ public class Hitreg {
         if (client.player == null || client.world == null) return;
         if (client.player.isSprinting() && !wasSprinting) sprintWasReset = true;
         wasSprinting = client.player.isSprinting();
-        if (isToggled() && withinFight() && System.currentTimeMillis() >= nextAttack && nextAttack != -1) run();
 
-        if (!wasGhosted && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack >= 450) {
+        if (!wasGhosted && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack > 450) {
             if (!newTarget) {
                 if (Toggle.ALERT_GHOSTS.toggled()) message("hit §7was §cghosted", "/hitreg alertGhosts");
                 last100Regs.addGhost();
@@ -104,7 +102,6 @@ public class Hitreg {
             }
         }
 
-        nextAttack = -1;
         sprintWasReset = false;
     }
 
