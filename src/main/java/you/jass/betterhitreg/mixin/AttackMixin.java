@@ -27,7 +27,7 @@ public abstract class AttackMixin {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private static void attack(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (client.player == null || !target.isAlive()) return;
-        hitEarly = System.currentTimeMillis() - lastProperAttack <= 450;
+        hitEarly = System.currentTimeMillis() - lastProperAttack <= 475;
         lastAttack = System.currentTimeMillis();
         if (!hitEarly) {
             hitHadCooldown = client.player.getAttackCooldownProgress(0.5f) <= 0.9f;
@@ -42,7 +42,10 @@ public abstract class AttackMixin {
             alreadyAnimated = false;
             alreadyKnockbacked = false;
             registered = false;
-            if (Hitreg.isToggled() && withinFight() && bothAlive()) Scheduler.schedule(Settings.getHitreg(), Hitreg::run);
+            if (Hitreg.isToggled() && withinFight() && bothAlive()) {
+                boolean sprintReset = sprintWasReset;
+                Scheduler.schedule(Settings.getHitreg(), () -> Hitreg.run(sprintReset));
+            }
         } else {
             client.execute(() -> {
                 if (!Toggle.SILENCE_SELF.toggled()) {

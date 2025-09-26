@@ -46,17 +46,16 @@ public class Hitreg {
         if (client.player.isSprinting() && !wasSprinting) sprintWasReset = true;
         wasSprinting = client.player.isSprinting();
 
-        if (!wasGhosted && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack > 450) {
+        if (!wasGhosted && !registered && withinFight() && bothAlive() && lastProperAttack != 0 && System.currentTimeMillis() - lastProperAttack > 375) {
             if (!newTarget) {
                 if (Toggle.ALERT_GHOSTS.toggled()) message("hit §7was §cghosted", "/hitreg alertGhosts");
                 last100Regs.addGhost();
             }
 
-            registered = true;
             wasGhosted = true;
         }
 
-        if (!tutorialAlreadySeen && Settings.isTutorial()) {
+        if (Settings.isTutorial() && !tutorialAlreadySeen) {
             message("Thanks for using BetterHitreg!", "/hitreg");
             message("use /hitreg or press " + Commands.getUIKey() + " to configure", "/hitreg");
             message("(you can click on these messages)", "/hitreg");
@@ -64,7 +63,7 @@ public class Hitreg {
         }
     }
 
-    public static void run() {
+    public static void run(boolean sprintWasReset) {
         Entity entity = client.world.getEntityById(lastEntity);
         if (entity == null) return;
 
@@ -101,8 +100,6 @@ public class Hitreg {
                 client.world.playSound(client.player, location.x, location.y, location.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 1);
             }
         }
-
-        sprintWasReset = false;
     }
 
     public static int getPing(UUID uuid) {
