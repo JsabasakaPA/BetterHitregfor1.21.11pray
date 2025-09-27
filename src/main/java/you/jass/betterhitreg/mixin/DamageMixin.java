@@ -47,7 +47,6 @@ public abstract class DamageMixin {
             lastDamageSource = damageSource;
             lastDamageTime = entity.getWorld().getTime();
             ci.cancel();
-            client.execute(() -> MultiVersion.message("dont animate", ""));
         }
 
         if (damageSource instanceof OnlyAnimate) {
@@ -55,7 +54,6 @@ public abstract class DamageMixin {
             maxHurtTime = 10;
             hurtTime = maxHurtTime;
             ci.cancel();
-            client.execute(() -> MultiVersion.message("only animate", ""));
         }
     }
 }
