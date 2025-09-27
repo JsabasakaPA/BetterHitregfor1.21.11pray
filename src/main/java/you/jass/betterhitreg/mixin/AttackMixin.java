@@ -38,10 +38,7 @@ public abstract class AttackMixin {
         boolean hitEarly = System.currentTimeMillis() - lastAttack < 475;
         boolean hittingNewTarget = lastTarget != target.getId();
         boolean didSprintReset = sprintWasReset;
-
-        //exempt players who have shields
         boolean targetHasShield = Hitreg.target.isHolding(Items.SHIELD);
-        if (targetHasShield) return;
 
         //make new targets take damage even if the hit was early
         if (!hitEarly || hittingNewTarget) {
@@ -52,8 +49,8 @@ public abstract class AttackMixin {
             if (lastAttackWasAnimated || hittingNewTarget) wasGhosted = false;
             else {
                 //don't count it if the hit was the first hit on a new target as some players may be invincible
-                //also don't count it if the previous hit was ghosted, since they may still be invincible
-                if (!wasGhosted && !newTarget) {
+                //also don't count it if the previous hit was ghosted or if they have a shield, since they may be invincible
+                if (!wasGhosted && !newTarget && !targetHasShield) {
                     if (Toggle.ALERT_GHOSTS.toggled()) client.execute(() -> message("hit §7was §cghosted", "/hitreg alertGhosts"));
                     last100Regs.addGhost();
                 }
@@ -65,6 +62,7 @@ public abstract class AttackMixin {
             lastAttack = System.currentTimeMillis();
             newTarget = hittingNewTarget;
             lastTarget = target.getId();
+            hasShield = targetHasShield;
             sprintWasReset = false;
             alreadyAnimated = false;
         }

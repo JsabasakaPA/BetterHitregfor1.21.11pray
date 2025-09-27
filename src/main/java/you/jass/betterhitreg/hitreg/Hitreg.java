@@ -31,6 +31,7 @@ public class Hitreg {
     public static boolean sprintWasReset;
     public static boolean wasGhosted = true;
     public static boolean newTarget = true;
+    public static boolean hasShield = true;
     public static RegQueue last100Regs = new RegQueue(100);
     public static boolean tutorialAlreadySeen;
 
@@ -65,8 +66,7 @@ public class Hitreg {
 
     public static boolean isToggled() {
         if (!Toggle.TOGGLE.toggled()) return false;
-        if (Toggle.SAFE_REGS_ONLY.toggled() && (newTarget || wasGhosted)) return false;
-        if (((LivingEntity) target).isHolding(Items.SHIELD)) return false;
+        if (Toggle.SAFE_REGS_ONLY.toggled() && (newTarget || wasGhosted || hasShield)) return false;
         return true;
     }
 

@@ -21,12 +21,9 @@ import static you.jass.betterhitreg.hitreg.Hitreg.client;
 
 @Mixin(LivingEntity.class)
 public abstract class DamageMixin {
-    @Shadow
-    @Nullable
-    private DamageSource lastDamageSource;
+    @Shadow @Nullable private DamageSource lastDamageSource;
 
-    @Shadow
-    private long lastDamageTime;
+    @Shadow private long lastDamageTime;
 
     @Shadow @Final public LimbAnimator limbAnimator;
 

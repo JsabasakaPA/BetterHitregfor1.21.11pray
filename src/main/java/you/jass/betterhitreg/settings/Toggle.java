@@ -49,14 +49,14 @@ public enum Toggle {
     }
 
     public boolean toggle() {
-        boolean newVal = Settings.toggle(key);
+        boolean value = Settings.toggle(key);
         String command = "/hitreg " + key;
-        MultiVersion.message(label + " §7is now " + (newVal ? "§aon§7" : "§coff§7"), command);
+        MultiVersion.message(label + " §7is now " + (value ? "§aon§7" : "§coff§7"), command);
 
         if (this == SAFE_REGS_ONLY) {
-            MultiVersion.message("§7first hits " + (newVal ? "will now" : "will no longer") + " use custom hitreg", command);
+            MultiVersion.message("§7first hits & shields " + (value ? "will no longer" : "will now") + " use custom hitreg", command);
         }
 
-        return newVal;
+        return value;
     }
 }
