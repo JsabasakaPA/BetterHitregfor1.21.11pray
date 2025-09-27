@@ -23,22 +23,19 @@ public abstract class PacketMixin {
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true, require = 1)
     private static void handlePacket(Packet packet, PacketListener listener, CallbackInfo ci) {
         if (client.world == null || client.player == null) return;
-        boolean isToggled = isToggled();
-        boolean withinFight = withinFight();
 
         if (packet instanceof EntityDamageS2CPacket damagePacket) {
             if (Toggle.HIDE_ANIMATIONS.toggled()) ci.cancel();
 
-            if (lastEntity == damagePacket.entityId()) {
-                long delay = System.currentTimeMillis() - lastProperAttack;
+            if (lastTarget == damagePacket.entityId()) {
+                boolean isToggled = isToggled();
+                boolean withinFight = withinFight();
+                long delay = System.currentTimeMillis() - lastAttack;
                 if (Toggle.ALERT_DELAYS.toggled() && !alreadyAnimated && delay <= 500) client.execute(() -> message("hitreg §7was §f" + delay + "§7ms", "/hitreg alertDelays"));
                 if (delay <= 500) last100Regs.addDelay((int) delay);
                 lastAnimation = System.currentTimeMillis();
                 alreadyAnimated = true;
-                registered = true;
-                wasGhosted = false;
-                if (isToggled && withinFight) ci.cancel();
-                if (!isToggled && withinFight && Toggle.PARTICLES_EVERY_HIT.toggled()) client.execute(() -> playParticles("ENCHANTED_HIT", targetEntity));
+                if (!isToggled && withinFight && Toggle.PARTICLES_EVERY_HIT.toggled()) client.execute(() -> playParticles("ENCHANTED_HIT", target));
                 processDelayedSounds();
             }
 
@@ -49,7 +46,9 @@ public abstract class PacketMixin {
         }
 
         else if (packet instanceof EntityAnimationS2CPacket animationPacket) {
-            if (lastEntity != getAnimationId(animationPacket)) return;
+            if (lastTarget != getAnimationId(animationPacket)) return;
+            boolean isToggled = isToggled();
+            boolean withinFight = withinFight();
 
             //crit particle
             if (animationPacket.getAnimationId() == 4) {
@@ -63,6 +62,7 @@ public abstract class PacketMixin {
         }
 
         else if (packet instanceof PlaySoundS2CPacket soundPacket) {
+            boolean isToggled = isToggled();
             boolean vanilla = !(isToggled || Toggle.LEGACY_SOUNDS.toggled() || Toggle.SILENCE_OTHER_FIGHTS.toggled() || Toggle.SILENCE_SELF.toggled() || Toggle.SILENCE_THEM.toggled());
             if (vanilla) return;
 

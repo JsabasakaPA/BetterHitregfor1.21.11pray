@@ -18,7 +18,6 @@ import you.jass.betterhitreg.ui.UIUtils;
 import java.awt.*;
 
 import static you.jass.betterhitreg.hitreg.Hitreg.client;
-import static you.jass.betterhitreg.hitreg.Hitreg.enchanted;
 
 public class MultiVersion {
     public static Vec3d getPosition(Entity entity) {

@@ -15,7 +15,7 @@ import static you.jass.betterhitreg.hitreg.Hitreg.*;
 public abstract class RenderMixin {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(Entity entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
-        if (!Toggle.HIDE_OTHER_FIGHTS.toggled() || client.player == null || entity == null || entity.getId() == lastEntity) return;
+        if (!Toggle.HIDE_OTHER_FIGHTS.toggled() || client.player == null || entity == null || entity.getId() == lastTarget) return;
         if (distanceFromPlayer(entity.getPos()) <= 30 || distanceToTarget() > 100 || System.currentTimeMillis() - lastAttack > 5000 || !bothAlive()) return;
         cir.setReturnValue(false);
     }

@@ -11,8 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import you.jass.betterhitreg.settings.Toggle;
 
-import static you.jass.betterhitreg.hitreg.Hitreg.client;
-import static you.jass.betterhitreg.hitreg.Hitreg.targetEntity;
+import static you.jass.betterhitreg.hitreg.Hitreg.*;
 
 public class Render {
     private static final int WHITE = 0xFFFFFFFF;
@@ -22,17 +21,17 @@ public class Render {
     public static void render(WorldRenderContext context) {
         boolean isHitbox = Toggle.RENDER_HITBOX.toggled();
         boolean isCross = Toggle.RENDER_CROSS.toggled();
-        if ((!isHitbox && !isCross) || targetEntity == null || !targetEntity.isAlive() || client.player == null) return;
-        Vec3d closest = getClosestPoint(client.player, targetEntity);
-        Box target = getBoundingBox(targetEntity);
+        if ((!isHitbox && !isCross) || target == null || !target.isAlive() || client.player == null) return;
+        Vec3d closest = getClosestPoint(client.player, target);
+        Box targetBox = getBoundingBox(target);
         boolean inRange = client.player.getEyePos().squaredDistanceTo(closest) <= 9;
 
         int hitbox = inRange ? RED : WHITE;
         int cross = inRange ? DARK_RED : RED;
 
         if (isCross && !isHitbox) cross = hitbox;
-        if (isHitbox) box(context, target, 3, hitbox);
-        if (isCross) cross(context, target, closest, 3, cross);
+        if (isHitbox) box(context, targetBox, 3, hitbox);
+        if (isCross) cross(context, targetBox, closest, 3, cross);
     }
 
     public static Box getBoundingBox(Entity entity) {

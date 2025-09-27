@@ -6,6 +6,7 @@
   "mixins": [
     "ArmorMixin",
     "AttackMixin",
+    "NetworkMixin",
     "DamageMixin",
     "PacketMixin",
     "PlayerMixin",
@@ -15,5 +16,8 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "NetworkMixin"
+  ]
 }
