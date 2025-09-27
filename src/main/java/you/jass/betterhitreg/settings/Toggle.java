@@ -5,7 +5,7 @@ import you.jass.betterhitreg.util.MultiVersion;
 public enum Toggle {
     TOGGLE("toggle", "custom hitreg", true),
     ALERT_DELAYS("alertDelays", "alert delays", false),
-    ALERT_GHOSTS("alertGhosts", "alert ghosts", true),
+    ALERT_GHOSTS("alertGhosts", "alert ghosts", false),
     LEGACY_SOUNDS("legacySounds", "1.8 sounds", false),
     HIDE_ANIMATIONS("hideAnimations", "hide animations", false),
     HIDE_ARMOR("hideArmor", "hide armor", false),
