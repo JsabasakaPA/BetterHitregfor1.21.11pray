@@ -7,6 +7,8 @@ The mod is designed to work for any ping below 500, but is especially useful for
 > [!NOTE]
 >No instances of false flagging any anticheat or giving any technical advantage have been found
 >
+>There is a keybind for switching your main hand, by default it's set to I
+>
 >It unknown if it properly works as intended on any specialized client such as feather, lunar, etc
 
 Modrinth: https://modrinth.com/mod/betterhitreg
