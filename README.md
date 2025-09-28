@@ -9,4 +9,6 @@ The mod is designed to work for any ping below 500, but is especially useful for
 >
 >It unknown if it properly works as intended on any specialized client such as feather, lunar, etc
 
+Modrinth: https://modrinth.com/mod/betterhitreg
+
 <img width="1920" height="1080" alt="hitreg" src="https://github.com/user-attachments/assets/20f41e55-9d4f-4939-a8ba-28ac3f8ca04b" />
