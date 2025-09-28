@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,6 +27,7 @@ public abstract class AttackMixin {
     private static void attack(PlayerEntity player, Entity target, CallbackInfo ci) {
         if (client.player == null || !(target instanceof LivingEntity) || !target.isAlive() || target.isInvulnerable()) return;
         Hitreg.target = (LivingEntity) target;
+        lastAttackLocation = client.player.getPos();
 
         //hitting before 500ms is too fast to deal damage, lower it by 25 because it's not exact and can be lower
         boolean hitEarly = System.currentTimeMillis() - lastAttack < 475;

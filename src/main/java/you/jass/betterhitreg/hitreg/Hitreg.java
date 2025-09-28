@@ -32,6 +32,7 @@ public class Hitreg {
     public static boolean wasGhosted = true;
     public static boolean newTarget = true;
     public static boolean hasShield = true;
+    public static Vec3d lastAttackLocation = Vec3d.ZERO;
     public static RegQueue last100Regs = new RegQueue(100);
     public static boolean tutorialAlreadySeen;
 
@@ -66,7 +67,7 @@ public class Hitreg {
 
     public static boolean isToggled() {
         if (!Toggle.TOGGLE.toggled()) return false;
-        if (Toggle.SAFE_REGS_ONLY.toggled() && (newTarget || wasGhosted || hasShield)) return false;
+        if (Toggle.SAFE_REGS_ONLY.toggled() && (newTarget || wasGhosted || distanceFromPlayer(lastAttackLocation) >= 999 || hasShield)) return false;
         return true;
     }
 

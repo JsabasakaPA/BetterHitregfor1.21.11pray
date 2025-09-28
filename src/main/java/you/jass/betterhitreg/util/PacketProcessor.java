@@ -1,32 +1,34 @@
-package you.jass.betterhitreg.mixin;
+package you.jass.betterhitreg.util;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import you.jass.betterhitreg.settings.Toggle;
-import you.jass.betterhitreg.util.Sound;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
-import static you.jass.betterhitreg.hitreg.Hitreg.*;
+import static you.jass.betterhitreg.hitreg.Hitreg.alreadyAnimated;
+import static you.jass.betterhitreg.hitreg.Hitreg.client;
+import static you.jass.betterhitreg.hitreg.Hitreg.isToggled;
+import static you.jass.betterhitreg.hitreg.Hitreg.last100Regs;
+import static you.jass.betterhitreg.hitreg.Hitreg.lastAnimation;
+import static you.jass.betterhitreg.hitreg.Hitreg.lastAttack;
+import static you.jass.betterhitreg.hitreg.Hitreg.lastAttacked;
+import static you.jass.betterhitreg.hitreg.Hitreg.lastTarget;
+import static you.jass.betterhitreg.hitreg.Hitreg.target;
+import static you.jass.betterhitreg.hitreg.Hitreg.withinFight;
 import static you.jass.betterhitreg.util.MultiVersion.*;
 
-@Mixin(ClientConnection.class)
-public abstract class PacketMixin {
-    @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true, require = 1)
-    private static void handlePacket(Packet packet, PacketListener listener, CallbackInfo ci) {
-        if (client.world == null || client.player == null) return;
+public class PacketProcessor {
+    public static boolean process(Packet packet) {
+        if (client.world == null || client.player == null) return true;
 
         if (packet instanceof EntityDamageS2CPacket damagePacket) {
-            if (Toggle.HIDE_ANIMATIONS.toggled()) ci.cancel();
-
             if (lastTarget == damagePacket.entityId()) {
                 boolean isToggled = isToggled();
                 boolean withinFight = withinFight();
@@ -46,37 +48,36 @@ public abstract class PacketMixin {
         }
 
         else if (packet instanceof EntityAnimationS2CPacket animationPacket) {
-            if (lastTarget != getAnimationId(animationPacket)) return;
+            if (lastTarget != getAnimationId(animationPacket)) return true;
             boolean isToggled = isToggled();
             boolean withinFight = withinFight();
 
             //crit particle
             if (animationPacket.getAnimationId() == 4) {
-                if (isToggled && withinFight) ci.cancel();
+                if (isToggled && withinFight) return false;
             }
 
             //enchanted particle
             else if (animationPacket.getAnimationId() == 5) {
-                if ((Toggle.PARTICLES_EVERY_HIT.toggled() || isToggled) && withinFight) ci.cancel();
+                if ((Toggle.PARTICLES_EVERY_HIT.toggled() || isToggled) && withinFight) return false;
             }
         }
 
         else if (packet instanceof PlaySoundS2CPacket soundPacket) {
-            boolean isToggled = isToggled();
-            boolean vanilla = !(isToggled || Toggle.LEGACY_SOUNDS.toggled() || Toggle.SILENCE_OTHER_FIGHTS.toggled() || Toggle.SILENCE_SELF.toggled() || Toggle.SILENCE_THEM.toggled());
-            if (vanilla) return;
+            boolean vanilla = !(isToggled() || Toggle.LEGACY_SOUNDS.toggled() || Toggle.SILENCE_OTHER_FIGHTS.toggled() || Toggle.SILENCE_SELF.toggled() || Toggle.SILENCE_THEM.toggled());
+            if (vanilla) return true;
 
             Sound sound = new Sound(soundPacket);
             if (sound.modern || sound.legacy) {
-                if (!processSound(sound)) ci.cancel();
+                return processSound(sound);
             }
         }
+
+        return true;
     }
 
-    @Unique
-    private static Queue<Sound> delayedSounds = new LinkedList<>();
+    private static final Queue<Sound> delayedSounds = new LinkedList<>();
 
-    @Unique
     private static void processDelayedSounds() {
         if (client.world == null || client.player == null) return;
         while (!delayedSounds.isEmpty()) {
@@ -89,7 +90,6 @@ public abstract class PacketMixin {
         }
     }
 
-    @Unique
     private static boolean processSound(Sound sound) {
         boolean isToggled = isToggled();
         boolean playerWithinFight = withinFight();

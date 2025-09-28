@@ -20,6 +20,7 @@ import static you.jass.betterhitreg.hitreg.Hitreg.*;
 public class BetterHitreg implements ModInitializer {
     public static KeyBinding uiKey;
     public static KeyBinding handKey;
+    public static int handSwitchCooldown;
 
     @Override
     public void onInitialize() {
@@ -37,17 +38,19 @@ public class BetterHitreg implements ModInitializer {
         handKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "Switch Hand",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_Z,
+                GLFW.GLFW_KEY_I,
                 "Hitreg"
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (uiKey.wasPressed() && client.currentScreen == null) client.setScreen(new UIScreen());
-            while (handKey.wasPressed()) {
+            while (handKey.wasPressed() && handSwitchCooldown == 0 && client.currentScreen == null) {
                 client.options.getMainArm().setValue(client.options.getMainArm().getValue().getOpposite());
                 client.player.setMainArm(client.options.getMainArm().getValue());
                 client.options.sendClientSettings();
+                handSwitchCooldown = 5;
             }
+            if (handSwitchCooldown > 0) handSwitchCooldown--;
         });
 
         WorldRenderEvents.END.register(Render::render);
