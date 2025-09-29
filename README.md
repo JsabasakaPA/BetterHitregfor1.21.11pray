@@ -1,19 +1,40 @@
-## IF YOU INSTALLED VERSION 1.0.0 PLEASE UPDATE IT IS BUGGED AND WILL ADD UP TO 50MS DELAY TO YOUR SET HITREG
 
-### Clientside fabric mod for 1.19.4 - 1.21.8 that registers hits before the server to make hitreg feel faster
+# Notice  
+**If you installed version `1.0.0` please update immediately**  
+**That version contains a bug that can add up to 50ms to your set custom hitreg**
 
-The mod is designed to work for any ping below 500, but is especially useful for high ping players (100+), as the difference in hitreg delay will be much more noticeable. It allows your hits to be registered immediately instead of waiting for the server to register them, creating the feeling as if you were 0 ping
+---
 
-> [!NOTE]
->No instances of false flagging any anticheat or giving any technical advantage have been found
->
->There is a keybind for switching your main hand, by default it's set to I
->
->It unknown if it properly works as intended on any specialized client such as feather, lunar, etc
->
->It has been used on the following servers with no false punishments:
->
->mcpvp.club, pvplegacy.net, minemen.club, sharpness.gg/blotcraft.com, stray.gg
+## Overview  
+BetterHitreg is a **client-side Fabric mod** for **Minecraft 1.19.4 – 1.21.8** that registers hits **before the server** making it *feel* as if you were low ping
+
+---
+
+## Features  
+- Designed for any **ping under 500ms**, with higher ping having a more noticeable difference
+- Makes hits *feel* as if they land instantly, simulating a **0ms experience**.  
+- Includes a **keybind to switch main hand** (default: `I`).  
+
+
+---
+
+## Safety  
+- **Not known to cause false flags or punishments from any anticheat**.  
+- **Does not** provide any unfair technical advantage, all settings are purely cosmetic
+- All custom hits are in **appearance only**, your actual hits are **not modified** in any way, only the way they are rendered and sound is affected
+- Designed for **vanilla Fabric clients**. Compatibility with specialized clients like Feather, Lunar, or Badlion is **uncertain**.  
+
+---
+
+## Tested On  
+The mod has been used safely on:  
+- `mcpvp.club`  
+- `pvplegacy.net`  
+- `minemen.club`  
+- `sharpness.gg` / `blotcraft.com`  
+- `stray.gg`  
+
+---
 
 Modrinth: https://modrinth.com/mod/betterhitreg
 
