@@ -3,7 +3,7 @@
 ### **That version contains a bug that can add up to 50ms to your set custom hitreg**
 
 ---
-
+ 
 ## Overview
 BetterHitreg is an **open source client-side Fabric mod** for **Minecraft 1.19.4 – 1.21.8** that registers hits **before the server** making it *feel* as if you were low ping
 
@@ -30,6 +30,9 @@ The mod has been used safely on:
 - `minemen.club`
 - `sharpness.gg` / `blotcraft.com`
 - `stray.gg`
+
+> [!WARNING]
+> These or any servers may deem this as a rule-breaking mod, please read the rules of your desired server before using
 
 ---
 
