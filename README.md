@@ -10,6 +10,10 @@ The mod is designed to work for any ping below 500, but is especially useful for
 >There is a keybind for switching your main hand, by default it's set to I
 >
 >It unknown if it properly works as intended on any specialized client such as feather, lunar, etc
+>
+>It has been tested on the following servers with no false punishments:
+>
+>mcpvp.club, pvplegacy.net, minemen.club, sharpness.gg/blotcraft.com, stray.gg
 
 Modrinth: https://modrinth.com/mod/betterhitreg
 
