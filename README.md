@@ -18,8 +18,7 @@ BetterHitreg is an **open source client-side Fabric mod** for **Minecraft 1.19.4
 ---
 
 ## Safety
-- **Not known to cause false flags or punishments from any anticheat**.  
-- **Does not** provide any unfair technical advantage, all settings are purely cosmetic
+- **No known false flags or punishments from any anticheat have been recorded** and no features provide any unfair technical advantage 
 - All custom hits are in **appearance only**, your actual hits are **not modified** in any way, only the way they are rendered and sound is affected
 - Compatibility with specialized clients like Feather, Lunar, or Badlion is **uncertain**.  
 
