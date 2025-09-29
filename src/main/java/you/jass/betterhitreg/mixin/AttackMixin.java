@@ -3,6 +3,7 @@ package you.jass.betterhitreg.mixin;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
@@ -25,7 +26,7 @@ import static you.jass.betterhitreg.util.MultiVersion.message;
 public abstract class AttackMixin {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private static void attack(PlayerEntity player, Entity target, CallbackInfo ci) {
-        if (client.player == null || !(target instanceof LivingEntity) || !target.isAlive() || target.isInvulnerable()) return;
+        if (client.player == null || !(target instanceof LivingEntity) || target instanceof ArmorStandEntity || !target.isAlive() || target.isInvulnerable()) return;
         Hitreg.target = (LivingEntity) target;
         lastAttackLocation = client.player.getPos();
 
