@@ -59,7 +59,7 @@ public class UIScreen extends Screen {
         widgets.add(new UILabel(
                 centerX,
                 centerY - vertical + 10,
-                textRenderer, "BetterHitreg v1.0.3",
+                textRenderer, "BetterHitreg v1.0.4",
                 header, true, true
         ));
 
