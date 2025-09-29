@@ -1,6 +1,6 @@
 # Notice
-**If you installed version `1.0.0` please update immediately**  
-**That version contains a bug that can add up to 50ms to your set custom hitreg**
+### **If you installed version `1.0.0` please update immediately**
+### **That version contains a bug that can add up to 50ms to your set custom hitreg**
 
 ---
 
