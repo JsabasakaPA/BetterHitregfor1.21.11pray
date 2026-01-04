@@ -3,19 +3,19 @@
 > **That version contains a bug that can add up to 50ms to your set custom hitreg**
  
 ## Overview
-BetterHitreg is an **open source client-side Fabric mod** for **Minecraft 1.19.4 – 1.21.8** that registers hits **before the server** making it *feel* as if you were low ping
+BetterHitreg is an **open source** client-side Fabric mod for Minecraft **1.19.4 – 1.21.8** that registers hits **before the server** making it feel as if you were low ping
 
 ---
 
 ## Features
-- Designed for any **ping under 500ms**, with higher ping having a more noticeable difference
-- Makes hits *feel* as if they land instantly, simulating a **0ms experience**
+- Makes hits feel as if they land instantly, simulating a **0ms experience**
+- Various utility features mainly designed for sword pvp
 - Includes a **keybind to switch main hand** (default: `I`)
 
 ---
 
 ## Safety
-- ✅ **No known false flags or punishments from any anticheat have been recorded** and no features are designed to provide any unfair technical advantage
+- ✅ **No known false flags or punishments from any anticheat** have been recorded and no features are designed to provide any unfair technical advantage
 - ✅ All custom hits are in **appearance only**, your actual hits are **not modified** in any way, only the way they are rendered and sound is affected
 - ⚠️ Compatibility with specialized clients like Feather or Lunar is **uncertain**
 
