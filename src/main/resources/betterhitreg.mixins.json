@@ -3,23 +3,25 @@
   "minVersion": "0.8",
   "package": "you.jass.betterhitreg.mixin",
   "compatibilityLevel": "JAVA_21",
+
   "mixins": [
     "ArmorMixin",
     "AttackMixin",
-    "NetworkMixin",
     "DamageMixin",
     "PlayerMixin",
-    "RenderMixin",
     "ServerAnimationMixin",
     "ServerDamageMixin",
     "ServerSoundMixin",
     "SoundMixin",
     "WorldMixin"
   ],
+
+  "client": [
+    "NetworkMixin",
+    "RenderMixin"
+  ],
+
   "injectors": {
     "defaultRequire": 1
-  },
-  "client": [
-    "NetworkMixin"
-  ]
+  }
 }
