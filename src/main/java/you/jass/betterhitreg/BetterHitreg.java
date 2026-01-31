@@ -5,52 +5,65 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Arm;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.util.Hand;
+import you.jass.betterhitreg.hitreg.Hitreg;
 import you.jass.betterhitreg.settings.Commands;
 import you.jass.betterhitreg.ui.UIScreen;
 import you.jass.betterhitreg.util.Render;
 
-import static you.jass.betterhitreg.hitreg.Hitreg.*;
-
 public class BetterHitreg implements ModInitializer {
+
     public static KeyBinding uiKey;
     public static KeyBinding handKey;
     public static int handSwitchCooldown;
 
     @Override
     public void onInitialize() {
-        client = MinecraftClient.getInstance();
+        MinecraftClient client = MinecraftClient.getInstance();
+        Hitreg.client = client;
+
         Commands.initialize();
-        ClientTickEvents.START_CLIENT_TICK.register(client -> tick());
+
+        ClientTickEvents.START_CLIENT_TICK.register(c -> Hitreg.tick());
 
         uiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "Open Menu",
+                "key.betterhitreg.open_menu",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_H,
-                "Hitreg"
+                InputUtil.GLFW_KEY_H,
+                "category.betterhitreg"
         ));
 
         handKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "Switch Hand",
+                "key.betterhitreg.switch_hand",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_I,
-                "Hitreg"
+                InputUtil.GLFW_KEY_J,
+                "category.betterhitreg"
         ));
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (uiKey.wasPressed() && client.currentScreen == null) client.setScreen(new UIScreen());
-            while (handKey.wasPressed() && handSwitchCooldown == 0 && client.currentScreen == null) {
-                client.options.getMainArm().setValue(client.options.getMainArm().getValue().getOpposite());
-                client.player.setMainArm(client.options.getMainArm().getValue());
-                client.options.sendClientSettings();
+        ClientTickEvents.END_CLIENT_TICK.register(c -> {
+            if (c.player == null) return;
+
+            while (uiKey.wasPressed() && c.currentScreen == null) {
+                c.setScreen(new UIScreen());
+            }
+
+            while (handKey.wasPressed() && handSwitchCooldown == 0 && c.currentScreen == null) {
+                Hand newHand = c.player.getActiveHand() == Hand.MAIN_HAND
+                        ? Hand.OFF_HAND
+                        : Hand.MAIN_HAND;
+
+                c.player.swingHand(newHand);
+                c.interactionManager.syncSelectedSlot();
+
                 handSwitchCooldown = 5;
             }
-            if (handSwitchCooldown > 0) handSwitchCooldown--;
+
+            if (handSwitchCooldown > 0) {
+                handSwitchCooldown--;
+            }
         });
 
         WorldRenderEvents.END.register(Render::render);
